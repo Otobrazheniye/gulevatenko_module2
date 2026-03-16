@@ -41,9 +41,9 @@ class Enemy:
         self.level = level
 
         if self.mode == 1:
-            self.lives = 1
+            self.lives = self.level
         else:
-            self.lives = 3
+            self.lives = self.level + 2
 
         self.player_history = None
 
@@ -75,9 +75,9 @@ class Select_attack:
         if enemy.mode == 2:
             match enemy.player_history:
                 case 1:
-                    number = random.choice[(1 , 2)]
+                    number = random.choice((1 , 2))
                 case 2,3:
-                    number = random.choice[(2 , 3)]
+                    number = random.choice((2 , 3))
                 case _:
                     number = random.randint(1,3)
         elif enemy.mode == 1:
