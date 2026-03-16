@@ -65,7 +65,7 @@ class Select_attack:
             try:
                 action_choose = int(input("Choose attack: \n1] Paper \n2]Stone \n3]Scissors"))
                 attack = self._number_to_attack(action_choose)
-                if action_choose is not None:
+                if attack is not None:
                     return attack
                 
             except ValueError:
@@ -103,10 +103,9 @@ class Decrease_lives():
             enemy.lives -=1
             if enemy.lives <= 0:
                 enemy.level += 1
+                enemy.lives = enemy.level + 1
                 raise EnemyDown (f"{enemy.level} Next Level\n\tEnemy Died!")
 
-
-class Decrease_lives():
     def player_decrease_lives(self,player:Player):
         player.lives -= 1
         if player.lives <= 0:
@@ -118,6 +117,7 @@ class Add_score():
 
 
 
-
+name = input("Enter player name:")
+player1 = Player(name)
 mode = choose_mode()
 enemy = Enemy(mode, settings.LEVEL)
