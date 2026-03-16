@@ -1,4 +1,5 @@
-LIVES= 3
+LIVES = 3
+LEVEL = 1
 
 PAPER = "Paper"
 STONE = "Stone"

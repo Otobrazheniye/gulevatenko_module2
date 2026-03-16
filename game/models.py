@@ -36,23 +36,27 @@ class Player():
         self.score = 0
 # Enemy
 class Enemy:
-    def __init__(self):
-        self.mode = choose_mode()
+    def __init__(self, mode: int, level: int):
+        self.mode = mode
+        self.level = level
+
         if self.mode == 1:
             self.lives = 1
         else:
             self.lives = 3
-        self.level = 1
+
         self.player_history = None
-        
 
 def choose_mode():
     while True:
-        mode = int(input(settings.MODES))
-        if 0 < mode < 3:
-            return mode
-        else:
-            print("Enter correct num")
+        try:
+            mode = int(input(settings.MODES))
+            if 0 < mode < 3:
+                return mode
+            else:
+                print("Enter correct num")
+        except ValueError:
+            print("Please enter a number")
 
 # Methods
 class Select_attack:
@@ -115,4 +119,5 @@ class Add_score():
 
 
 
-    
+mode = choose_mode()
+enemy = Enemy(mode, settings.LEVEL)
