@@ -22,9 +22,10 @@
 #1 __init__ — для инициализации соперника, принимает только уровень и сложность, чтобы вычислить количество жизней, назначает количество жизней и уровень
 #1 select_attack — метод для случайного выбора атаки (1, 2, 3), использует константы из файла settings.py
 #1 decrease_lives — уменьшает жизни при проигрыше «боя», вызывает исключение EnemyDown из файла exceptions.py, если у соперника закончились жизни
+from abc import ABC, abstractmethod
 import random
 import settings
-from exceptions import GameOver, EnemyDown
+from exceptions import GameOver, EnemyDown, PlayerExit
 
 # Player
 class Player():
@@ -46,11 +47,42 @@ class Enemy:
 
         self.player_history = None
 
+# mode
+class Mode(ABC):
+    @abstractmethod
+    def attack(self):
+        pass
+
+class Normal(Mode):
+    def __init__(self,history_choose):
+        self.history_choose = history_choose
+    def attack(self):
+        number = random.randint(1,3)
+        return _number_to_attack(number)
+    
+
+class Hard(Mode):
+    def __init__(self,history_choose):
+        self.history_choose = history_choose
+    def attack(self):
+        match enemy.player_history:
+            case 1:
+                number = random.choice((1 , 2))
+            case 2,3:
+                number = random.choice((2 , 3))
+            case _:
+                number = random.randint(1,3)
+        return _number_to_attack(number)
+    
+
+#endregion
+
 def choose_mode():
     while True:
         try:
             mode = int(input(settings.MODES))
-            if 0 < mode < 3:
+            if mode is not None and isinstance(mode,int):
+                # can create logistic chain with count modes
                 return mode
             else:
                 print("Enter correct num")
@@ -115,8 +147,18 @@ def player_add_score(player:Player):
     player.score += 1
 
 
-
-name = input("Enter player name:")
-player1 = Player(name)
-mode = choose_mode()
-enemy = Enemy(mode, settings.LEVEL)
+# temp main
+# main — для запуска всего кода. Внутри этой функции должен быть запущен 
+# процесс выбора из трёх пунктов: запуск игры, посмотреть очки и выйти из игры (1, 2, 3)
+while True:
+    user_choose = int(input("Welcome! \n Choose what procces you want to do? \n1] Start Game \n\t 2] Score information \n\t\t 3] Exit"))
+    match user_choose:
+        case 1:
+            name = input("Enter player name:")
+            player1 = Player(name)
+            mode = choose_mode()
+            enemy = Enemy(mode, settings.LEVEL)
+        case 2:
+            pass
+        case 3:
+            raise PlayerExit("Good Bye!")

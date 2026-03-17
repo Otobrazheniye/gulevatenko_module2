@@ -9,3 +9,6 @@ class GameOver(GameException):
 class EnemyDown(GameException):
     """Raised when enemy has no lives left"""
     pass
+class PlayerExit(GameException):
+    """Raised when player exit"""
+    pass
