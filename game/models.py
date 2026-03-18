@@ -1,31 +1,9 @@
-# Player
-# Атрибуты:
-
-#1 name — имя игрока, задаётся пользователем через консоль
-#1 lives — количество жизней, берётся из константы из settings.py
-#1 score — очки игрока, изначально 0
-
-# Методы:
-
-#1 __init__ — для инициализации игрока, принимает только имя, назначает имя, количество жизней и очков
-#1 select_attack — метод для ввода атаки игроком. Вводим до тех пор, пока пользователь не введёт валидное значение (1, 2, 3),  использует константы из файла settings.py
-#1 decrease_lives — метод, который будет вызываться, если игрок проиграл «бой», уменьшает жизни на 1. Если жизни закончились, вызывает исключение GameOver из файла exceptions.py
-#1 add_score — метод для начисления очков игроку
-
-# Enemy
-# Атрибуты:
-
-#1 lives — количество жизней, изначально зависит от уровня соперника и уровня сложности, уменьшается на 1, когда соперник проигрывает «бой»
-#1 level — уровень соперника, будет увеличиваться с каждым новым соперником. Изначально 1
-# Методы:
-
-#1 __init__ — для инициализации соперника, принимает только уровень и сложность, чтобы вычислить количество жизней, назначает количество жизней и уровень
-#1 select_attack — метод для случайного выбора атаки (1, 2, 3), использует константы из файла settings.py
-#1 decrease_lives — уменьшает жизни при проигрыше «боя», вызывает исключение EnemyDown из файла exceptions.py, если у соперника закончились жизни
 from abc import ABC, abstractmethod
 import random
 import settings
 from exceptions import GameOver, EnemyDown, PlayerExit
+
+
 
 # Player
 class Player():
@@ -55,6 +33,7 @@ class Normal(Mode):
 class Hard(Mode):
     def __init__(self,player_history=None):
         self.player_history = player_history
+        
 
     def attack(self) -> int:
         match self.player_history:
@@ -66,12 +45,19 @@ class Hard(Mode):
                 return random.randint(1,3)
 
 #endregion
+MODES = {
+    1: Normal,
+    2: Hard,
+}
+
 
 def create_mode(mode_number: int) -> Mode:
-    mode_class = settings.MODES.get(mode_number)
+    mode_class = MODES.get(mode_number)
     if mode_class is None:
         raise ValueError("Wrong mode")
     return mode_class()
+
+
 
 # Enemy
 class Enemy:
@@ -79,22 +65,24 @@ class Enemy:
         self.mode = mode
         self.level = level
         self.player_history = None
+        self.lives = self._calculate_lives()        
 
-        if isinstance(mode, Normal):
-            self.lives = self.level
-        else:
-            self.lives = self.level + 2
+    def _calculate_lives(self) -> int:
+        if isinstance(self.mode, Normal):
+            return self.level
+        return self.level + 2
 
 
 def choose_mode():
     while True:
         try:
-            mode = int(input(settings.MODES))
-            if mode in settings.MODES:
+            mode = int(input(settings.MODE_PROMPT))
+            if mode in MODES:
                 return mode
             print("Enter correct num")
         except ValueError:
             print("Please enter a number")
+
 
 # Methods
 
@@ -115,7 +103,6 @@ def enemy_select_attack(enemy: Enemy) -> int:
     enemy_action = enemy.mode.attack()
     return _number_to_attack(enemy_action)
         
-
 def _number_to_attack(number: int):
     match number:
         case 1:
@@ -134,7 +121,7 @@ def enemy_decrease_lives(enemy:Enemy,result:int):
         enemy.lives -=1
         if enemy.lives <= 0:
             enemy.level += 1
-            enemy.lives = enemy.level + 1
+            enemy.lives = enemy._calculate_lives()
             raise EnemyDown (f"{enemy.level} Next Level\n\tEnemy Died!")
 
 def player_decrease_lives(player:Player):
@@ -143,25 +130,85 @@ def player_decrease_lives(player:Player):
         raise GameOver (f"{player.name} Died!")
 
 
+
 def player_add_score(player:Player):
     player.score += 1
 
 
-# temp main     
+        
+
+# temp main
 while True:
-    user_choose = int(input("Welcome! \n Choose what procces you want to do? \n1] Start Game \n\t 2] Score information \n\t\t 3] Exit"))
-    match user_choose:
-        case 1:
-            name = input("Enter player name:")
-            player1 = Player(name)
+    try:
+        user_choose = int(input(
+            "Welcome!\n"
+            "Choose what process you want to do?\n"
+            "1] Start Game\n"
+            "2] Score information\n"
+            "3] Exit\n"
+        ))
 
-            mode_number = choose_mode()
-            mode = create_mode(mode_number)
+        match user_choose:
+            case 1:
+                name = input("Enter player name: ")
+                player1 = Player(name)
+# plr -> C
+                mode_number = choose_mode()
+                mode = create_mode(mode_number)
+# mode -> C
+                enemy = Enemy(mode, settings.LEVEL)
+# enm -> C
+                while True:
+                    try:
+                        print("\n>->->-> !!New Round!! <-<-<-<")
+                        print(f"Player lives: {player1.lives} | score: {player1.score}")
+                        print(f"Enemy level: {enemy.level} | lives: {enemy.lives}")
+# inf -> S
+                        player_attack = player_select_attack(player1)
+                        enemy.player_history = player_attack
+                        enemy_attack = enemy_select_attack(enemy)
+# enm & plr -> c atk
+                        print(f"Player attack: {player_attack}")
+                        print(f"Enemy attack: {enemy_attack}")
+# inf -> S
+                        if player_attack == enemy_attack:
+                            print("Draw!")
+# D
+                        elif (
+                            (player_attack == settings.PAPER and enemy_attack == settings.STONE) or
+                            (player_attack == settings.STONE and enemy_attack == settings.SCISSORS) or
+                            (player_attack == settings.SCISSORS and enemy_attack == settings.PAPER)
+                        ):
+                            print("Player wins the round!")
+                            player_add_score(player1)
+                            enemy_decrease_lives(enemy, 1)
+# W
+                        else:
+                            print("Enemy wins the round!")
+                            player_decrease_lives(player1)
+# L
+                    except EnemyDown as e:
+                        print(e)
+                        print("New enemy appeared!")
+                        continue
 
-            enemy = Enemy(mode, settings.LEVEL)
-            action_choose = player_select_attack(player1)
+                    except GameOver as e:
+                        print(e)
+                        print(f"Final score: {player1.score}")
+                        break
 
-        case 2:
-            pass
-        case 3:
-            raise PlayerExit("Good Bye!")
+            case 2:
+                print("Score information is not implemented yet.")
+
+            case 3:
+                raise PlayerExit("Good Bye!")
+
+            case _:
+                print("Wrong menu choice")
+
+    except PlayerExit as e:
+        print(e)
+        break
+
+    except ValueError:
+        print("Please enter a number")
