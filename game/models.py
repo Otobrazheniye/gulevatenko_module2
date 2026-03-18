@@ -34,58 +34,65 @@ class Player():
         self.lives = settings.LIVES 
         # change on const settings.py
         self.score = 0
-# Enemy
-class Enemy:
-    def __init__(self, mode: int, level: int):
-        self.mode = mode
-        self.level = level
-
-        if self.mode == 1:
-            self.lives = self.level
-        else:
-            self.lives = self.level + 2
-
-        self.player_history = None
 
 # mode
 class Mode(ABC):
     @abstractmethod
-    def attack(self):
+    def attack(self) -> int:
         pass
 
+
+
+
 class Normal(Mode):
-    def __init__(self,history_choose):
-        self.history_choose = history_choose
-    def attack(self):
-        number = random.randint(1,3)
-        return _number_to_attack(number)
+    def __init__(self,player_history=None):
+        self.player_history = player_history
+    def attack(self)-> int:  
+        return random.randint(1,3)
     
+
 
 class Hard(Mode):
-    def __init__(self,history_choose):
-        self.history_choose = history_choose
-    def attack(self):
-        match enemy.player_history:
+    def __init__(self,player_history=None):
+        self.player_history = player_history
+
+    def attack(self) -> int:
+        match self.player_history:
             case 1:
-                number = random.choice((1 , 2))
+                return random.choice((1 , 2))
             case 2,3:
-                number = random.choice((2 , 3))
+                return random.choice((2 , 3))
             case _:
-                number = random.randint(1,3)
-        return _number_to_attack(number)
-    
+                return random.randint(1,3)
 
 #endregion
+
+def create_mode(mode_number: int) -> Mode:
+    mode_class = settings.MODES.get(mode_number)
+    if mode_class is None:
+        raise ValueError("Wrong mode")
+    return mode_class()
+
+# Enemy
+class Enemy:
+    def __init__(self, mode: Mode, level: int):
+        self.mode = mode
+        self.level = level
+        self.player_history = None
+
+        if isinstance(mode, Normal):
+            self.lives = self.level
+        else:
+            self.lives = self.level + 2
+
 
 def choose_mode():
     while True:
         try:
             mode = int(input(settings.MODES))
-            if mode is not None and isinstance(mode,int):
-                # can create logistic chain with count modes
+            if mode in settings.MODES:
                 return mode
-            else:
-                print("Enter correct num")
+            print("Enter correct num")
         except ValueError:
             print("Please enter a number")
 
@@ -102,18 +109,11 @@ def player_select_attack(player: Player) -> int:
         except ValueError:
             print("Please enter a number")
 
-def enemy_select_attack(enemy:Enemy) -> int:
-    if enemy.mode == 2:
-        match enemy.player_history:
-            case 1:
-                number = random.choice((1 , 2))
-            case 2,3:
-                number = random.choice((2 , 3))
-            case _:
-                number = random.randint(1,3)
-    elif enemy.mode == 1:
-        number = random.randint(1,3)
-    return _number_to_attack(number)
+
+def enemy_select_attack(enemy: Enemy) -> int:
+    enemy.mode.player_history = enemy.player_history
+    enemy_action = enemy.mode.attack()
+    return _number_to_attack(enemy_action)
         
 
 def _number_to_attack(number: int):
@@ -147,17 +147,20 @@ def player_add_score(player:Player):
     player.score += 1
 
 
-# temp main
-# main — для запуска всего кода. Внутри этой функции должен быть запущен 
-# процесс выбора из трёх пунктов: запуск игры, посмотреть очки и выйти из игры (1, 2, 3)
+# temp main     
 while True:
     user_choose = int(input("Welcome! \n Choose what procces you want to do? \n1] Start Game \n\t 2] Score information \n\t\t 3] Exit"))
     match user_choose:
         case 1:
             name = input("Enter player name:")
             player1 = Player(name)
-            mode = choose_mode()
+
+            mode_number = choose_mode()
+            mode = create_mode(mode_number)
+
             enemy = Enemy(mode, settings.LEVEL)
+            action_choose = player_select_attack(player1)
+
         case 2:
             pass
         case 3:
