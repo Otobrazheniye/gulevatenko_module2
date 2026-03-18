@@ -16,33 +16,36 @@ class Player():
 # mode
 class Mode(ABC):
     @abstractmethod
-    def attack(self) -> int:
+    def attack(self,player_history=None) -> int:
+        pass
+
+    @abstractmethod
+    def get_enemy_lives(self, level: int) -> int:
         pass
 
 
 
-
 class Normal(Mode):
-    def __init__(self,player_history=None):
-        self.player_history = player_history
-    def attack(self)-> int:  
-        return random.randint(1,3)
-    
+    def attack(self, player_history=None) -> int:
+        return random.randint(1, 3)
+
+    def get_enemy_lives(self, level: int) -> int:
+        return level
+
 
 
 class Hard(Mode):
-    def __init__(self,player_history=None):
-        self.player_history = player_history
-        
-
-    def attack(self) -> int:
-        match self.player_history:
+    def attack(self, player_history=None) -> int:
+        match player_history:
             case 1:
-                return random.choice((1 , 2))
-            case 2,3:
-                return random.choice((2 , 3))
+                return random.choice((1, 2))
+            case 2 | 3:
+                return random.choice((2, 3))
             case _:
-                return random.randint(1,3)
+                return random.randint(1, 3)
+    def get_enemy_lives(self, level: int) -> int:
+        return level + 2
+    
 
 #endregion
 MODES = {
@@ -68,9 +71,7 @@ class Enemy:
         self.lives = self._calculate_lives()        
 
     def _calculate_lives(self) -> int:
-        if isinstance(self.mode, Normal):
-            return self.level
-        return self.level + 2
+        return self.mode.get_enemy_lives(self.level)
 
 
 def choose_mode():
@@ -102,6 +103,11 @@ def enemy_select_attack(enemy: Enemy) -> int:
     enemy.mode.player_history = enemy.player_history
     enemy_action = enemy.mode.attack()
     return _number_to_attack(enemy_action)
+
+def enemy_select_attack(enemy: Enemy) -> int:
+    enemy_action = enemy.mode.attack(enemy.player_history)
+    return _number_to_attack(enemy_action)
+
         
 def _number_to_attack(number: int):
     match number:
