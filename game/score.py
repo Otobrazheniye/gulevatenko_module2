@@ -41,24 +41,41 @@ import models
 import settings
 
 class PlayerRecord:
-    def __init__(self, player_name:models.Player, enemy_mode:models.Enemy):
-        self.name = player_name.name
-        self.mode = enemy_mode.mode
-        self.score= player_name.score
+    # def __init__(self, player_name:models.Player, enemy_mode:models.Enemy):
+    #     self.name = player_name.name
+    #     self.mode = enemy_mode.mode
+    #     self.score= player_name.score
 
+    def __init__(self, name: str, mode: str, score: int):
+        self.name = name
+        self.mode = mode
+        self.score = score
     
-    def __str__(self):
+    def __str__(self) ->str:
         return f"Name: {self.name}\tMode: {self.mode}\t Score: {self.score}\n"
     
-    def __gt__(self,other:"PlayerRecord"):
+    def __gt__(self,other:"PlayerRecord") -> bool:
         if not isinstance(other,PlayerRecord):
-            return InterruptedError
+            return NotImplemented
         return self.score > other.score
 
 
 
+
 class ScoreHandler:
-    pass
+    def __init__(self,records:PlayerRecord):
+        self.records = []
+
+    def __eq__(self:PlayerRecord,other:PlayerRecord):
+        if not isinstance(other,PlayerRecord):
+            return NotImplemented
+        if self.name == other.name:
+            return self.mode == other.mode
+        return False
+
+    def add_record(self):
+        pass
+
 
 class GameRecord:
     pass
