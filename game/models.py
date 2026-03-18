@@ -87,29 +87,27 @@ def choose_mode():
 
 # Methods
 
-def player_select_attack(player: Player) -> int:
+def player_select_attack() -> str:
+# def player_select_attack(player: Player) -> int:
     while True:
         try:
             action_choose = int(input("Choose attack: \n1] Paper \n2]Stone \n3]Scissors"))
             attack = _number_to_attack(action_choose)
             if attack is not None:
                 return attack
-                
+            print("Wrong parameter")    
         except ValueError:
             print("Please enter a number")
 
 
-def enemy_select_attack(enemy: Enemy) -> int:
-    enemy.mode.player_history = enemy.player_history
-    enemy_action = enemy.mode.attack()
-    return _number_to_attack(enemy_action)
+
 
 def enemy_select_attack(enemy: Enemy) -> int:
     enemy_action = enemy.mode.attack(enemy.player_history)
     return _number_to_attack(enemy_action)
 
         
-def _number_to_attack(number: int):
+def _number_to_attack(number: int) -> str | None:
     match number:
         case 1:
             return settings.PAPER
@@ -121,100 +119,100 @@ def _number_to_attack(number: int):
             print("Wrong parameter")
             return None
             
+def enemy_decrease_lives(enemy: Enemy) -> None:
+# def enemy_decrease_lives(enemy:Enemy,result:int):
+    # if result == 1:
+    enemy.lives -=1
+    if enemy.lives <= 0:
+        enemy.level += 1
+        enemy.lives = enemy._calculate_lives()
+        raise EnemyDown (f"{enemy.level} Next Level\n\tEnemy Died!")
 
-def enemy_decrease_lives(enemy:Enemy,result:int):
-    if result == 1:
-        enemy.lives -=1
-        if enemy.lives <= 0:
-            enemy.level += 1
-            enemy.lives = enemy._calculate_lives()
-            raise EnemyDown (f"{enemy.level} Next Level\n\tEnemy Died!")
-
-def player_decrease_lives(player:Player):
+def player_decrease_lives(player:Player) -> None:
     player.lives -= 1
     if player.lives <= 0:
         raise GameOver (f"{player.name} Died!")
 
 
 
-def player_add_score(player:Player):
+def player_add_score(player:Player) -> None:
     player.score += 1
 
 
         
 
 # temp main
-while True:
-    try:
-        user_choose = int(input(
-            "Welcome!\n"
-            "Choose what process you want to do?\n"
-            "1] Start Game\n"
-            "2] Score information\n"
-            "3] Exit\n"
-        ))
+# while True:
+#     try:
+#         user_choose = int(input(
+#             "Welcome!\n"
+#             "Choose what process you want to do?\n"
+#             "1] Start Game\n"
+#             "2] Score information\n"
+#             "3] Exit\n"
+#         ))
+# ## C -> show_main_menu()
+#         match user_choose:
+#             case 1:
+#                 name = input("Enter player name: ")
+#                 player1 = Player(name)
+# # plr -> C
+#                 mode_number = choose_mode()
+#                 mode = create_mode(mode_number)
+# # mode -> C
+#                 enemy = Enemy(mode, settings.LEVEL)
+# # enm -> C
+#                 while True:
+#                     try:
+#                         print("\n>->->-> !!New Round!! <-<-<-<")
+#                         print(f"Player lives: {player1.lives} | score: {player1.score}")
+#                         print(f"Enemy level: {enemy.level} | lives: {enemy.lives}")
+# # inf -> S
+#                         player_attack = player_select_attack(player1)
+#                         enemy.player_history = player_attack
+#                         enemy_attack = enemy_select_attack(enemy)
+# # enm & plr -> c atk
+#                         print(f"Player attack: {player_attack}")
+#                         print(f"Enemy attack: {enemy_attack}")
+# # inf -> S
+#                         if player_attack == enemy_attack:
+#                             print("Draw!")
+# # D
+#                         elif (
+#                             (player_attack == settings.PAPER and enemy_attack == settings.STONE) or
+#                             (player_attack == settings.STONE and enemy_attack == settings.SCISSORS) or
+#                             (player_attack == settings.SCISSORS and enemy_attack == settings.PAPER)
+#                         ):
+#                             print("Player wins the round!")
+#                             player_add_score(player1)
+#                             enemy_decrease_lives(enemy, 1)
+# # W
+#                         else:
+#                             print("Enemy wins the round!")
+#                             player_decrease_lives(player1)
+# # L
+#                     except EnemyDown as e:
+#                         print(e)
+#                         print("New enemy appeared!")
+#                         continue
 
-        match user_choose:
-            case 1:
-                name = input("Enter player name: ")
-                player1 = Player(name)
-# plr -> C
-                mode_number = choose_mode()
-                mode = create_mode(mode_number)
-# mode -> C
-                enemy = Enemy(mode, settings.LEVEL)
-# enm -> C
-                while True:
-                    try:
-                        print("\n>->->-> !!New Round!! <-<-<-<")
-                        print(f"Player lives: {player1.lives} | score: {player1.score}")
-                        print(f"Enemy level: {enemy.level} | lives: {enemy.lives}")
-# inf -> S
-                        player_attack = player_select_attack(player1)
-                        enemy.player_history = player_attack
-                        enemy_attack = enemy_select_attack(enemy)
-# enm & plr -> c atk
-                        print(f"Player attack: {player_attack}")
-                        print(f"Enemy attack: {enemy_attack}")
-# inf -> S
-                        if player_attack == enemy_attack:
-                            print("Draw!")
-# D
-                        elif (
-                            (player_attack == settings.PAPER and enemy_attack == settings.STONE) or
-                            (player_attack == settings.STONE and enemy_attack == settings.SCISSORS) or
-                            (player_attack == settings.SCISSORS and enemy_attack == settings.PAPER)
-                        ):
-                            print("Player wins the round!")
-                            player_add_score(player1)
-                            enemy_decrease_lives(enemy, 1)
-# W
-                        else:
-                            print("Enemy wins the round!")
-                            player_decrease_lives(player1)
-# L
-                    except EnemyDown as e:
-                        print(e)
-                        print("New enemy appeared!")
-                        continue
+#                     except GameOver as e:
+#                         print(e)
+#                         print(f"Final score: {player1.score}")
+#                         break
 
-                    except GameOver as e:
-                        print(e)
-                        print(f"Final score: {player1.score}")
-                        break
+#             case 2:
+#                 print("Score information is not implemented yet.")
 
-            case 2:
-                print("Score information is not implemented yet.")
+#             case 3:
+#                 raise PlayerExit("Good Bye!")
 
-            case 3:
-                raise PlayerExit("Good Bye!")
+#             case _:
+#                 print("Wrong menu choice")
 
-            case _:
-                print("Wrong menu choice")
+#     except PlayerExit as e:
+#         print(e)
+#         break
 
-    except PlayerExit as e:
-        print(e)
-        break
-
-    except ValueError:
-        print("Please enter a number")
+#     except ValueError:
+#         print("Please enter a number")
