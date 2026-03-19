@@ -59,25 +59,38 @@ class PlayerRecord:
             return NotImplemented
         return self.score > other.score
 
-
-
-
-class ScoreHandler:
-    def __init__(self,records:PlayerRecord):
-        self.records = []
-
-    def __eq__(self:PlayerRecord,other:PlayerRecord):
+    def __eq__(self:PlayerRecord,other:PlayerRecord)->bool:
         if not isinstance(other,PlayerRecord):
             return NotImplemented
         if self.name == other.name:
-            return self.mode == other.mode
+            return self.name == other.name and self.mode == other.mode
         return False
 
-    def add_record(self):
-        pass
 
 
 class GameRecord:
+    def __init__(self):
+        self.records = []
+
+
+
+    def add_record(self,new_record:PlayerRecord):
+        for i,record in enumerate(self.records):
+            if record == new_record:
+                self.records[i] = new_record
+                self.prepare_records()
+                return
+        self.records.append(new_record)
+        self.prepare_records()
+
+        
+    def prepare_records(self,other:PlayerRecord):
+        self.records.sort(reverse=True)
+        self.records = self.records[:10]
+
+
+class ScoreHandler:
+
     pass
 
 # Note
