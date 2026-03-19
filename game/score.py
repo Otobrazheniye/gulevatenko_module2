@@ -1,19 +1,4 @@
-
-# <!!__________ __________!!>
-#! ScoreHandler
-
-# game_record — объект класса GameRecord, туда мы будем считывать сохранённые очки и записывать таблицу с новыми
-# file_name — имя файла, откуда и куда мы записываем очки
-
-
-# __init__ — принимает только имя файла и сохраняет его. Вызывает метод для чтения файла
-# read — метод, который будет читать файл и каждую его строку сохранять в PlayerRecord, которые будут сохраняться в GameRecord
-# save — метод, который нужен, чтобы записать новые результаты в файл (предварительно отсортировать и обрезать, если нужно)
-# display — метод для отображения очков
-
-
-import models
-import settings
+from . import settings
 
 class PlayerRecord:
     # def __init__(self, player_name:models.Player, enemy_mode:models.Enemy):
@@ -85,6 +70,29 @@ class ScoreHandler:
                 self.game_record.add_record(records)
         except FileNotFoundError:
             pass
+
+def read(self):
+    try:
+        with open(self.file_name, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            parts = line.split(",")
+            if len(parts) != 3:
+                continue
+            name = parts[0]
+            mode = parts[1]
+            score = int(parts[2])
+
+            record = PlayerRecord(name, mode, score)
+            self.game_record.add_record(record)
+    except FileNotFoundError:
+        pass
+
+
+
 
     def save(self):
         self.game_record.prepare_records()
