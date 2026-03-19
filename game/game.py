@@ -1,14 +1,8 @@
+from . import models
+from . import settings
+from . import score
+from .exceptions import GameOver, EnemyDown, PlayerExit
 
-# Для этого вызывает два метода: fight и handle_fight_result. Отслеживает, не произошло ли одно из исключений при вызове второго метода — GameOver или EnemyDown. 
-# При первом завершает игру и вызывает метод для записи очков, при втором создаёт нового, более сильного соперника
-# fight — метод запрашивает у пользователя и соперника атаки, из констант получает результат боя (-1, 0, 1)
-# handle_fight_result — принимает результат боя и в зависимости от результата отнимает жизни либо у игрока, либо у соперника
-# save_score — вызывает сохранение очков при помощи класса из файла score.py
-
-
-import models
-import settings
-from exceptions import GameOver, EnemyDown, PlayerExit
 
 
 
@@ -100,12 +94,17 @@ def start_game() -> None:
 
         except GameOver as e:
             print(e)
-            print(f"Final score: {player.score}")
+            # print(f"Final score: {player.score}")
+            player_record = score.PlayerRecord(player.name,enemy.mode.__class__.__name__,player.score)
+            total_board = score.ScoreHandler("score_board.txt")
+            total_board.game_record.add_record(player_record)
+            total_board.save()
             break
 
 
 def show_score_info() -> None:
-    print("Score information is not implemented yet.")
+    total_board = score.ScoreHandler("score_board.txt")
+    total_board.display()
 
 
 def play(choice: int) -> None:
@@ -121,15 +120,15 @@ def play(choice: int) -> None:
 
 #  temp main 2
 
-while True:
-    try:
-        user_choose = show_main_menu()
-# int menu choose
-        play(user_choose)
+# while True:
+#     try:
+#         user_choose = show_main_menu()
+# # int menu choose
+#         play(user_choose)
 
-    except PlayerExit as e:
-        print(e)
-        break
+#     except PlayerExit as e:
+#         print(e)
+#         break
 # [show_main_menu -> play()] -> [start_game()] -> [create_player() -> create_enemy() -> play_round(player, enemy) or
 # create_player() -> ask_player_name()
 # create_enemy_for_game() -> models.choose_mode() -> models.create_mode(mode_number) 

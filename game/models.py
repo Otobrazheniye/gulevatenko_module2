@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import random
-import settings
-from exceptions import GameOver, EnemyDown, PlayerExit
+from . import settings
+from game.exceptions import GameOver, EnemyDown, PlayerExit
 
 
 
