@@ -8,6 +8,7 @@
 
 import models
 import settings
+import score
 from exceptions import GameOver, EnemyDown, PlayerExit
 
 
