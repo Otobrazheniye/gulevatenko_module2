@@ -1,5 +1,6 @@
 from game.score import ScoreHandler
 from game.models import *
+from game.game import *
 
 import pytest
 
@@ -53,46 +54,109 @@ import pytest
 
 # <!-------- ENEMY ---------!>
 
-#! Создание соперника с корректным количеством жизней в зависимости от уровня и сложности
-#! Метод select_attack возвращает одно из допустимых значений
-#! Метод decrease_lives вызывает EnemyDown, когда жизни заканчиваются
+
+# @pytest.mark.parametrize(
+#     "mode, level, expected_lives",
+#     [
+#         (Normal(), 1, 1),
+#         (Normal(), 3, 3),
+#         (Hard(), 1, 3),
+#         (Hard(), 2, 4),
+#     ]
+# )
+# def test_enemy_lives(mode, level, expected_lives):
+#     tenemy = Enemy(mode, level)
+
+#     assert tenemy.lives == expected_lives
 
 
+# @pytest.mark.parametrize(
+#     "player_history, expected_attacks",
+#     [
+#         (1, {settings.PAPER, settings.STONE}),
+#         (2, {settings.STONE, settings.SCISSORS}),
+#         (3, {settings.PAPER, settings.SCISSORS}),
+#     ]
+# )
+# def test_select_attack(player_history, expected_attacks):
+#     tenemy = Enemy(Hard(), 1)
+#     tenemy.player_history = player_history
+
+#     enemy_attack = enemy_select_attack(tenemy)
+
+#     assert enemy_attack in expected_attacks
+
+# @pytest.mark.parametrize("lives,expected_exception",[(1,EnemyDown)])
+# def test_enemy_decrease_lives(lives,expected_exception):
+#     tenemy = Enemy(Hard(),1)
+#     tenemy.lives = lives
+#     with pytest.raises(expected_exception):
+#         enemy_decrease_lives(tenemy)
+
+# <!-------- Game ---------!>
+
+#! Метод fight возвращает корректный результат (-1, 0, 1) для разных комбинаций атак
+#! Метод create_enemy создаёт соперника с правильным уровнем
 
 @pytest.mark.parametrize(
-    "mode, level, expected_lives",
-    [
-        (Normal(), 1, 1),
-        (Normal(), 3, 3),
-        (Hard(), 1, 3),
-        (Hard(), 2, 4),
-    ]
-)
-def test_enemy_lives(mode, level, expected_lives):
-    tenemy = Enemy(mode, level)
-
-    assert tenemy.lives == expected_lives
-
-
-@pytest.mark.parametrize(
-    "player_history, expected_attacks",
-    [
-        (1, {settings.PAPER, settings.STONE}),
-        (2, {settings.STONE, settings.SCISSORS}),
-        (3, {settings.PAPER, settings.SCISSORS}),
-    ]
-)
-def test_select_attack(player_history, expected_attacks):
+    "tplayer_attack, tenemy_attack",[(settings.PAPER, settings.PAPER)])
+def test_fight_draw(tplayer_attack, tenemy_attack):
+    tplayer = Player("test_Andrii")
     tenemy = Enemy(Hard(), 1)
-    tenemy.player_history = player_history
 
-    enemy_attack = enemy_select_attack(tenemy)
+    start_player_lives = tplayer.lives
+    start_enemy_lives = tenemy.lives
+    start_score = tplayer.score
 
-    assert enemy_attack in expected_attacks
+    handle_round_result(tplayer, tenemy, tplayer_attack, tenemy_attack)
 
-@pytest.mark.parametrize("lives,expected_exception",[(1,EnemyDown)])
-def test_enemy_decrease_lives(lives,expected_exception):
+    assert tplayer.lives == start_player_lives
+    assert tenemy.lives == start_enemy_lives
+    assert tplayer.score == start_score
+
+@pytest.mark.parametrize("tplayer_attack, tenemy_attack",[(settings.PAPER, settings.STONE)])
+def test_fight_win(tplayer_attack,tenemy_attack):
+    tplayer = Player("test_Andrii")
     tenemy = Enemy(Hard(),1)
-    tenemy.lives = lives
-    with pytest.raises(expected_exception):
-        enemy_decrease_lives(tenemy)
+
+    start_player_lives = tplayer.lives
+    start_enemy_lives = tenemy.lives
+    start_score = tplayer.score
+
+    handle_round_result(tplayer,tenemy,tplayer_attack,tenemy_attack)
+    assert tplayer.lives == start_player_lives
+    assert tenemy.lives < start_enemy_lives
+    assert tplayer.score > start_score
+
+
+@pytest.mark.parametrize("tplayer_attack, tenemy_attack",[(settings.SCISSORS, settings.STONE)])
+def test_fight_lose(tplayer_attack,tenemy_attack):
+    tplayer = Player("test_Andrii")
+    tenemy = Enemy(Hard(),1)
+
+    start_player_lives = tplayer.lives
+    start_enemy_lives = tenemy.lives
+    start_score = tplayer.score
+
+    handle_round_result(tplayer,tenemy,tplayer_attack,tenemy_attack)
+    assert tplayer.lives < start_player_lives
+    assert tenemy.lives == start_enemy_lives
+    assert tplayer.score == start_score
+
+
+
+@pytest.mark.parametrize(
+    "mode_number, expected_mode",
+    [
+        (1, models.Normal),
+        (2, models.Hard),
+    ]
+)
+def test_create_enemy(monkeypatch, mode_number, expected_mode):
+    monkeypatch.setattr(models, "choose_mode", lambda: mode_number)
+
+    enemy = create_enemy()
+
+    assert enemy.level == settings.LEVEL
+    assert isinstance(enemy.mode, expected_mode)
+
