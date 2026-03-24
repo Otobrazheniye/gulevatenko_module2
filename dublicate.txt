@@ -1,1 +1,2 @@
-Andrii,Hard,0
+Andrii,Hard,6
+Max,Hard,3

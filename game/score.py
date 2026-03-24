@@ -55,43 +55,27 @@ class ScoreHandler:
         self.game_record = GameRecord()
         self.read()
 
+
+
     def read(self):
         try:
             with open(self.file_name, "r", encoding="utf-8") as f:
                 lines = f.readlines()
             for line in lines:
-                parts = line.strip().split(",")
-                
-                name =parts[0]
-                mode =parts[1]
-                score=int(parts[2])
+                line = line.strip()
+                if not line:
+                    continue
+                parts = line.split(",")
+                if len(parts) != 3:
+                    continue
+                name = parts[0]
+                mode = parts[1]
+                score = int(parts[2])
 
-                records = PlayerRecord(name,mode,score)
-                self.game_record.add_record(records)
+                record = PlayerRecord(name, mode, score)
+                self.game_record.add_record(record)
         except FileNotFoundError:
             pass
-
-def read(self):
-    try:
-        with open(self.file_name, "r", encoding="utf-8") as f:
-            lines = f.readlines()
-        for line in lines:
-            line = line.strip()
-            if not line:
-                continue
-            parts = line.split(",")
-            if len(parts) != 3:
-                continue
-            name = parts[0]
-            mode = parts[1]
-            score = int(parts[2])
-
-            record = PlayerRecord(name, mode, score)
-            self.game_record.add_record(record)
-    except FileNotFoundError:
-        pass
-
-
 
 
     def save(self):
@@ -115,3 +99,9 @@ def read(self):
 
 # for p in players:
 #     print(p.score)
+
+
+# eq
+    # def add_record(...
+    #eq       if record == new_record:
+    #             ..

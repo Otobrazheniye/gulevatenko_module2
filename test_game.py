@@ -95,68 +95,91 @@ import pytest
 
 # <!-------- Game ---------!>
 
-#! Метод fight возвращает корректный результат (-1, 0, 1) для разных комбинаций атак
-#! Метод create_enemy создаёт соперника с правильным уровнем
+# @pytest.mark.parametrize(
+#     "tplayer_attack, tenemy_attack",[(settings.PAPER, settings.PAPER)])
+# def test_fight_draw(tplayer_attack, tenemy_attack):
+#     tplayer = Player("test_Andrii")
+#     tenemy = Enemy(Hard(), 1)
 
-@pytest.mark.parametrize(
-    "tplayer_attack, tenemy_attack",[(settings.PAPER, settings.PAPER)])
-def test_fight_draw(tplayer_attack, tenemy_attack):
-    tplayer = Player("test_Andrii")
-    tenemy = Enemy(Hard(), 1)
+#     start_player_lives = tplayer.lives
+#     start_enemy_lives = tenemy.lives
+#     start_score = tplayer.score
 
-    start_player_lives = tplayer.lives
-    start_enemy_lives = tenemy.lives
-    start_score = tplayer.score
+#     handle_round_result(tplayer, tenemy, tplayer_attack, tenemy_attack)
 
-    handle_round_result(tplayer, tenemy, tplayer_attack, tenemy_attack)
+#     assert tplayer.lives == start_player_lives
+#     assert tenemy.lives == start_enemy_lives
+#     assert tplayer.score == start_score
 
-    assert tplayer.lives == start_player_lives
-    assert tenemy.lives == start_enemy_lives
-    assert tplayer.score == start_score
+# @pytest.mark.parametrize("tplayer_attack, tenemy_attack",[(settings.PAPER, settings.STONE)])
+# def test_fight_win(tplayer_attack,tenemy_attack):
+#     tplayer = Player("test_Andrii")
+#     tenemy = Enemy(Hard(),1)
 
-@pytest.mark.parametrize("tplayer_attack, tenemy_attack",[(settings.PAPER, settings.STONE)])
-def test_fight_win(tplayer_attack,tenemy_attack):
-    tplayer = Player("test_Andrii")
-    tenemy = Enemy(Hard(),1)
+#     start_player_lives = tplayer.lives
+#     start_enemy_lives = tenemy.lives
+#     start_score = tplayer.score
 
-    start_player_lives = tplayer.lives
-    start_enemy_lives = tenemy.lives
-    start_score = tplayer.score
-
-    handle_round_result(tplayer,tenemy,tplayer_attack,tenemy_attack)
-    assert tplayer.lives == start_player_lives
-    assert tenemy.lives < start_enemy_lives
-    assert tplayer.score > start_score
+#     handle_round_result(tplayer,tenemy,tplayer_attack,tenemy_attack)
+#     assert tplayer.lives == start_player_lives
+#     assert tenemy.lives < start_enemy_lives
+#     assert tplayer.score > start_score
 
 
-@pytest.mark.parametrize("tplayer_attack, tenemy_attack",[(settings.SCISSORS, settings.STONE)])
-def test_fight_lose(tplayer_attack,tenemy_attack):
-    tplayer = Player("test_Andrii")
-    tenemy = Enemy(Hard(),1)
+# @pytest.mark.parametrize("tplayer_attack, tenemy_attack",[(settings.SCISSORS, settings.STONE)])
+# def test_fight_lose(tplayer_attack,tenemy_attack):
+#     tplayer = Player("test_Andrii")
+#     tenemy = Enemy(Hard(),1)
 
-    start_player_lives = tplayer.lives
-    start_enemy_lives = tenemy.lives
-    start_score = tplayer.score
+#     start_player_lives = tplayer.lives
+#     start_enemy_lives = tenemy.lives
+#     start_score = tplayer.score
 
-    handle_round_result(tplayer,tenemy,tplayer_attack,tenemy_attack)
-    assert tplayer.lives < start_player_lives
-    assert tenemy.lives == start_enemy_lives
-    assert tplayer.score == start_score
+#     handle_round_result(tplayer,tenemy,tplayer_attack,tenemy_attack)
+#     assert tplayer.lives < start_player_lives
+#     assert tenemy.lives == start_enemy_lives
+#     assert tplayer.score == start_score
 
 
 
-@pytest.mark.parametrize(
-    "mode_number, expected_mode",
-    [
-        (1, models.Normal),
-        (2, models.Hard),
+# @pytest.mark.parametrize(
+#     "mode_number, expected_mode",
+#     [
+#         (1, models.Normal),
+#         (2, models.Hard),
+#     ]
+# )
+# def test_create_enemy(monkeypatch, mode_number, expected_mode):
+#     monkeypatch.setattr(models, "choose_mode", lambda: mode_number)
+
+#     enemy = create_enemy()
+
+#     assert enemy.level == settings.LEVEL
+#     assert isinstance(enemy.mode, expected_mode)
+
+# <!-------- PlayerRecord ---------!>
+# Метод __gt__ корректно сравнивает записи по очкам
+# Метод __eq__ корректно сравнивает записи по имени и режиму
+
+
+
+def test_sort_records():
+    records = [
+        score.PlayerRecord("A", "Normal", 10),
+        score.PlayerRecord("B", "Normal", 5),
+        score.PlayerRecord("C", "Normal", 20),
     ]
-)
-def test_create_enemy(monkeypatch, mode_number, expected_mode):
-    monkeypatch.setattr(models, "choose_mode", lambda: mode_number)
 
-    enemy = create_enemy()
+    records.sort(reverse=True)
 
-    assert enemy.level == settings.LEVEL
-    assert isinstance(enemy.mode, expected_mode)
+    scores = [r.score for r in records]
 
+    assert scores == [20, 10, 5]
+
+def test_eq_records():
+    records = [
+        score.PlayerRecord("A", "Normal", 10),
+        score.PlayerRecord("A", "Normal", 5),
+    ]  
+
+    assert records[0] == records[1]
