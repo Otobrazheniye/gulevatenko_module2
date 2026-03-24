@@ -102,7 +102,7 @@ def player_select_attack() -> str:
 
 
 
-def enemy_select_attack(enemy: Enemy) -> int:
+def enemy_select_attack(enemy: Enemy) -> str | None:
     enemy_action = enemy.mode.attack(enemy.player_history)
     return _number_to_attack(enemy_action)
 

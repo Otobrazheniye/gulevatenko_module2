@@ -15,50 +15,73 @@ import pytest
 #         assert isinstance(record.score, int)
 
 
-# Player:
-
-#! Создание игрока с корректным именем и начальными значениями (lives, score)
-#! Метод add_score корректно увеличивает очки
-#! Метод decrease_lives уменьшает жизни на 1
-#! Метод decrease_lives вызывает GameOver, когда жизни заканчиваются
-
-
 # <!-------- PLAYER ---------!>
+# @pytest.mark.parametrize(
+#     "name, lives, score",
+#     [
+#         ("Oleg", 3, 0),
+#     ]
+# )
+# def test_create_player(name, lives, score):
+#     tplayer = Player(name)
+
+#     assert tplayer.name == name
+#     assert tplayer.lives == lives
+#     assert tplayer.score == score
+
+
+# @pytest.mark.parametrize("score",[0])
+# def test_add_score(score):
+#     tplayer = Player("test_Andrii")
+#     player_add_score(tplayer)
+#     assert tplayer.score == score + 1 
+
+# @pytest.mark.parametrize("lives",[3])
+# def test_decrease_lives(lives):
+#     tplayer = Player("test_Andrii")
+#     tplayer.lives = lives
+#     player_decrease_lives(tplayer)
+#     assert tplayer.lives == lives - 1
+
+# @pytest.mark.parametrize("expected_exception, lives",[(GameOver,1)])
+# def test_decrease_game_over(expected_exception,lives):
+#     tplayer = Player("test_Andrii")
+#     tplayer.lives = lives
+#     with pytest.raises(expected_exception):
+#         player_decrease_lives(tplayer)        
+
+
+# <!-------- ENEMY ---------!>
+
+#! Создание соперника с корректным количеством жизней в зависимости от уровня и сложности
+# Метод select_attack возвращает одно из допустимых значений
+# Метод decrease_lives вызывает EnemyDown, когда жизни заканчиваются
+
+
+
+# @pytest.mark.parametrize(
+#     "mode, level, expected_lives",
+#     [
+#         (Normal(), 1, 1),
+#         (Normal(), 3, 3),
+#         (Hard(), 1, 3),
+#         (Hard(), 2, 4),
+#     ]
+# )
+# def test_enemy_lives(mode, level, expected_lives):
+#     tenemy = Enemy(mode, level)
+
+#     assert tenemy.lives == expected_lives
+
+
 @pytest.mark.parametrize(
-    "name, lives, score",
+    "enemy_choose,expected_attack",
     [
-        ("Oleg", 3, 0),
-    ]
-)
-def test_create_player(name, lives, score):
-    tplayer = Player(name)
-
-    assert tplayer.name == name
-    assert tplayer.lives == lives
-    assert tplayer.score == score
-
-
-@pytest.mark.parametrize("score",[0])
-def test_add_score(score):
-    tplayer = Player("test_Andrii")
-    player_add_score(tplayer)
-    assert tplayer.score == score + 1 
-
-@pytest.mark.parametrize("lives",[3])
-def test_decrease_lives(lives):
-    tplayer = Player("test_Andrii")
-    tplayer.lives = lives
-    player_decrease_lives(tplayer)
-    assert tplayer.lives == lives - 1
-
-@pytest.mark.parametrize("expected_exception, lives",[(GameOver,1)])
-def test_decrease_game_over(expected_exception,lives):
-    tplayer = Player("test_Andrii")
-    tplayer.lives = lives
-    with pytest.raises(expected_exception):
-        player_decrease_lives(tplayer)        
-
-
-
- 
-
+        (1,settings.PAPER)
+        (2,settings.STONE)
+        (3,settings.SCISSORS)
+    ])
+def test_select_attack(enemy_choose,expected_attack):
+    tenemy = Enemy(Hard(),1)
+    enemy_select_attack(tenemy)
+    
