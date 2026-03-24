@@ -54,34 +54,45 @@ import pytest
 # <!-------- ENEMY ---------!>
 
 #! Создание соперника с корректным количеством жизней в зависимости от уровня и сложности
-# Метод select_attack возвращает одно из допустимых значений
-# Метод decrease_lives вызывает EnemyDown, когда жизни заканчиваются
+#! Метод select_attack возвращает одно из допустимых значений
+#! Метод decrease_lives вызывает EnemyDown, когда жизни заканчиваются
 
-
-
-# @pytest.mark.parametrize(
-#     "mode, level, expected_lives",
-#     [
-#         (Normal(), 1, 1),
-#         (Normal(), 3, 3),
-#         (Hard(), 1, 3),
-#         (Hard(), 2, 4),
-#     ]
-# )
-# def test_enemy_lives(mode, level, expected_lives):
-#     tenemy = Enemy(mode, level)
-
-#     assert tenemy.lives == expected_lives
 
 
 @pytest.mark.parametrize(
-    "enemy_choose,expected_attack",
+    "mode, level, expected_lives",
     [
-        (1,settings.PAPER)
-        (2,settings.STONE)
-        (3,settings.SCISSORS)
-    ])
-def test_select_attack(enemy_choose,expected_attack):
+        (Normal(), 1, 1),
+        (Normal(), 3, 3),
+        (Hard(), 1, 3),
+        (Hard(), 2, 4),
+    ]
+)
+def test_enemy_lives(mode, level, expected_lives):
+    tenemy = Enemy(mode, level)
+
+    assert tenemy.lives == expected_lives
+
+
+@pytest.mark.parametrize(
+    "player_history, expected_attacks",
+    [
+        (1, {settings.PAPER, settings.STONE}),
+        (2, {settings.STONE, settings.SCISSORS}),
+        (3, {settings.PAPER, settings.SCISSORS}),
+    ]
+)
+def test_select_attack(player_history, expected_attacks):
+    tenemy = Enemy(Hard(), 1)
+    tenemy.player_history = player_history
+
+    enemy_attack = enemy_select_attack(tenemy)
+
+    assert enemy_attack in expected_attacks
+
+@pytest.mark.parametrize("lives,expected_exception",[(1,EnemyDown)])
+def test_enemy_decrease_lives(lives,expected_exception):
     tenemy = Enemy(Hard(),1)
-    enemy_select_attack(tenemy)
-    
+    tenemy.lives = lives
+    with pytest.raises(expected_exception):
+        enemy_decrease_lives(tenemy)
