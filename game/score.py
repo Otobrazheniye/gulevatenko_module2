@@ -71,29 +71,6 @@ class ScoreHandler:
         except FileNotFoundError:
             pass
 
-def read(self):
-    try:
-        with open(self.file_name, "r", encoding="utf-8") as f:
-            lines = f.readlines()
-        for line in lines:
-            line = line.strip()
-            if not line:
-                continue
-            parts = line.split(",")
-            if len(parts) != 3:
-                continue
-            name = parts[0]
-            mode = parts[1]
-            score = int(parts[2])
-
-            record = PlayerRecord(name, mode, score)
-            self.game_record.add_record(record)
-    except FileNotFoundError:
-        pass
-
-
-
-
     def save(self):
         self.game_record.prepare_records()
 
