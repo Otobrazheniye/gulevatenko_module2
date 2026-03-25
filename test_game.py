@@ -1,4 +1,4 @@
-from game.score import ScoreHandler
+from game.score import *
 from game.models import *
 from game.game import *
 
@@ -158,28 +158,69 @@ import pytest
 #     assert isinstance(enemy.mode, expected_mode)
 
 # <!-------- PlayerRecord ---------!>
-# Метод __gt__ корректно сравнивает записи по очкам
-# Метод __eq__ корректно сравнивает записи по имени и режиму
+
+# def test_sort_records():
+#     records = [
+#         score.PlayerRecord("A", "Normal", 10),
+#         score.PlayerRecord("B", "Normal", 5),
+#         score.PlayerRecord("C", "Normal", 20),
+#     ]
+
+#     records.sort(reverse=True)
+
+#     scores = [r.score for r in records]
+
+#     assert scores == [20, 10, 5]
+
+# def test_eq_records():
+#     records = [
+#         score.PlayerRecord("A", "Normal", 10),
+#         score.PlayerRecord("A", "Normal", 5),
+#     ]  
+
+#     assert records[0] == records[1]
+
+# <!-------- GameRecord ---------!>
+#! Метод add_record добавляет новую запись
+#! Метод add_record перезаписывает существующую запись при совпадении имени и режима
+# Метод prepare_records сортирует записи по убыванию очков и обрезает до MAX_RECORDS_NUMBER
 
 
+def test_add_record():
+    game_record = GameRecord()
+    new_record = PlayerRecord("Andrii", "Hard", 6)
 
-def test_sort_records():
-    records = [
-        score.PlayerRecord("A", "Normal", 10),
-        score.PlayerRecord("B", "Normal", 5),
-        score.PlayerRecord("C", "Normal", 20),
+    game_record.add_record(new_record)
+    
+    assert len(game_record.records) == 1
+    assert game_record.records[0] == new_record
+
+def test_change_record():
+    game_record = GameRecord()
+
+    new_record = PlayerRecord("Andrii","Hard",6)
+    game_record.add_record(new_record)
+
+    new_record2 = PlayerRecord("Andrii","Hard",10)
+    game_record.add_record(new_record2)
+
+    assert len(game_record.records) == 1
+    assert game_record.records[0] == new_record2
+
+def test_prepare_records_sort_and_limit(monkeypatch):
+    monkeypatch.setattr(settings, "MAX_SCORE", 2)
+
+    game_record = GameRecord()
+
+    game_record.records = [
+        PlayerRecord("A", "Normal", 10),
+        PlayerRecord("B", "Normal", 5),
+        PlayerRecord("C", "Normal", 20),
     ]
 
-    records.sort(reverse=True)
+    game_record.prepare_records()
 
-    scores = [r.score for r in records]
+    scores = [r.score for r in game_record.records]
+    assert scores == [20, 10]
 
-    assert scores == [20, 10, 5]
-
-def test_eq_records():
-    records = [
-        score.PlayerRecord("A", "Normal", 10),
-        score.PlayerRecord("A", "Normal", 5),
-    ]  
-
-    assert records[0] == records[1]
+    assert len(game_record.records) == 2
