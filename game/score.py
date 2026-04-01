@@ -83,12 +83,3 @@ class ScoreHandler:
     def display(self):
         for record in self.game_record.records:
             print(record)
-
-
-# Note
-# players = [Player(10), Player(5), Player(20)]
-
-# players.sort()
-
-# for p in players:
-#     print(p.score)

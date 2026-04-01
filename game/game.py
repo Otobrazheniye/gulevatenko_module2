@@ -117,19 +117,3 @@ def play(choice: int) -> None:
             raise PlayerExit("Good Bye!")
         case _:
             print("Wrong menu choice")
-
-#  temp main 2
-
-# while True:
-#     try:
-#         user_choose = show_main_menu()
-# # int menu choose
-#         play(user_choose)
-
-#     except PlayerExit as e:
-#         print(e)
-#         break
-# [show_main_menu -> play()] -> [start_game()] -> [create_player() -> create_enemy() -> play_round(player, enemy) or
-# create_player() -> ask_player_name()
-# create_enemy_for_game() -> models.choose_mode() -> models.create_mode(mode_number) 
-# play_round(player, enemy) -> print_round_info(player, enemy) -> models.player_select_attack() -> SAVE player atk history -> models.enemy_select_attack(enemy) -> handle_round_result(player, enemy, player_attack, enemy_attack) -> [models.player_add_score(player) and models.enemy_decrease_lives(enemy)] or  models.player_decrease_lives(player)
