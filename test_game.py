@@ -64,6 +64,7 @@ def test_enemy_lives(mode, level, expected_lives):
         (1, {settings.PAPER, settings.STONE}),
         (2, {settings.STONE, settings.SCISSORS}),
         (3, {settings.PAPER, settings.SCISSORS}),
+        # error
     ]
 )
 def test_select_attack(player_history, expected_attacks):
@@ -141,8 +142,7 @@ def test_create_enemy(monkeypatch, mode_number, expected_mode):
     monkeypatch.setattr(models, "choose_mode", lambda: mode_number)
 
     enemy = create_enemy()
-
-    assert enemy.level == settings.LEVEL
+    assert enemy.level == settings.START_LEVEL
     assert isinstance(enemy.mode, expected_mode)
 
 # <!-------- PlayerRecord ---------!>
@@ -218,6 +218,7 @@ def test_all_records_types():
 
     print(total_board.game_record.records)
     assert len(total_board.game_record.records) > 0
+    # 0
     for record in total_board.game_record.records:
         assert isinstance(record.name, str)
         assert isinstance(record.mode, str)

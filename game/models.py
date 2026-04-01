@@ -5,7 +5,7 @@ from game.exceptions import GameOver, EnemyDown, PlayerExit
 
 
 # Player
-class Player():
+class Player:
     def __init__(self, name: str):
         self.name = name
         self.lives = settings.LIVES 

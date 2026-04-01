@@ -42,6 +42,7 @@
   "test_game.py::test_select_attack[2-Stone]",
   "test_game.py::test_select_attack[2-expected_attack1]",
   "test_game.py::test_select_attack[2-expected_attacks1]",
+  "test_game.py::test_select_attack[2-expected_attacks2]",
   "test_game.py::test_select_attack[3-Scissors]",
   "test_game.py::test_select_attack[3-expected_attack2]",
   "test_game.py::test_select_attack[3-expected_attacks2]",
