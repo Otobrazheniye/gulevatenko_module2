@@ -23,14 +23,14 @@ def test_create_player(name, lives, score):
 @pytest.mark.parametrize("score",[0])
 def test_add_score(score):
     tplayer = Player("test_Andrii")
-    player_add_score(tplayer)
+    Player.player_add_score(tplayer)
     assert tplayer.score == score + 1 
 
 @pytest.mark.parametrize("lives",[3])
 def test_decrease_lives(lives):
     tplayer = Player("test_Andrii")
     tplayer.lives = lives
-    player_decrease_lives(tplayer)
+    Player.player_decrease_lives(tplayer)
     assert tplayer.lives == lives - 1
 
 @pytest.mark.parametrize("expected_exception, lives",[(GameOver,1)])
@@ -38,7 +38,7 @@ def test_decrease_game_over(expected_exception,lives):
     tplayer = Player("test_Andrii")
     tplayer.lives = lives
     with pytest.raises(expected_exception):
-        player_decrease_lives(tplayer)        
+        Player.player_decrease_lives(tplayer)        
 
 
 # <!-------- ENEMY ---------!>
@@ -80,7 +80,7 @@ def test_enemy_decrease_lives(lives,expected_exception):
     tenemy = Enemy(Hard(),1)
     tenemy.lives = lives
     with pytest.raises(expected_exception):
-        enemy_decrease_lives(tenemy)
+        Enemy.enemy_decrease_lives(tenemy)
 
 # <!-------- Game ---------!>
 

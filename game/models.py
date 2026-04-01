@@ -11,6 +11,14 @@ class Player:
         self.lives = settings.LIVES 
         self.score = 0
 
+    def player_decrease_lives(self) -> None:
+        self.lives -= 1
+        if self.lives <= 0:
+            raise GameOver (f"{self.name} Died!")
+
+    def player_add_score(self) -> None:
+        self.score += 1
+
 
 class Mode(ABC):
     @abstractmethod
@@ -66,6 +74,13 @@ class Enemy:
         self.player_history = None
         self.lives = self._calculate_lives()        
 
+    def enemy_decrease_lives(self) -> None:
+        self.lives -=1
+        if self.lives <= 0:
+            self.level += 1
+            self.lives = self._calculate_lives()
+            raise EnemyDown (f"{self.level} Next Level\n\tEnemy Died!")
+
 
     def _calculate_lives(self) -> int:
         return self.mode.get_enemy_lives(self.level)
@@ -111,21 +126,3 @@ def _number_to_attack(number: int) -> str | None:
         case _:
             print("Wrong parameter")
             return None
-            
-
-def enemy_decrease_lives(enemy: Enemy) -> None:
-    enemy.lives -=1
-    if enemy.lives <= 0:
-        enemy.level += 1
-        enemy.lives = enemy._calculate_lives()
-        raise EnemyDown (f"{enemy.level} Next Level\n\tEnemy Died!")
-
-
-def player_decrease_lives(player:Player) -> None:
-    player.lives -= 1
-    if player.lives <= 0:
-        raise GameOver (f"{player.name} Died!")
-
-
-def player_add_score(player:Player) -> None:
-    player.score += 1

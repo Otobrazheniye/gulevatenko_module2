@@ -49,12 +49,12 @@ def handle_round_result(player: models.Player, enemy: models.Enemy, player_attac
 
     if is_player_winner(player_attack, enemy_attack):
         print("Player wins the round!")
-        models.player_add_score(player)
-        models.enemy_decrease_lives(enemy)
+        models.Player.player_add_score(player)
+        models.Enemy.enemy_decrease_lives(enemy)
         return
 
     print("Enemy wins the round!")
-    models.player_decrease_lives(player)
+    models.Player.player_decrease_lives(player)
 
 
 def play_round(player: models.Player, enemy: models.Enemy) -> None:

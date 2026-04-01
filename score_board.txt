@@ -1,7 +1,7 @@
 Oleg,Normal,6
 Andrii,Hard,5
 Mia,Hard,4
+Mindi,Hard,4
 Andrii,Normal,3
 Oleg,Hard,2
-Mindi,Hard,2
 Juliana,Normal,1
