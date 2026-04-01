@@ -51,16 +51,33 @@ class ScoreHandler:
         try:
             with open(self.file_name, "r", encoding="utf-8") as f:
                 lines = f.readlines()
+
             for line in lines:
-                parts = line.strip().split(",")
-                name =parts[0]
-                mode =parts[1]
-                score=int(parts[2])
-                records = PlayerRecord(name,mode,score)
-                self.game_record.add_record(records)
-                
+                line = line.strip()
+
+                if not line:
+                    continue
+
+                parts = line.split(",")
+
+                if len(parts) != 3:
+                    # print(f"Invalid line format: {line}")
+                    continue
+
+                name = parts[0].strip()
+                mode = parts[1].strip()
+                score_str = parts[2].strip()
+
+                if not score_str.isdigit():
+                    # print(f"Invalid score: {line}")
+                    continue
+
+                score = int(score_str)
+                record = PlayerRecord(name, mode, score)
+                self.game_record.add_record(record)
+
         except FileNotFoundError:
-            pass
+            print("File not found")
 
     def save(self):
         self.game_record.prepare_records()
