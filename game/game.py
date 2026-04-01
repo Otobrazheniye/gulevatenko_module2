@@ -4,8 +4,6 @@ from . import score
 from .exceptions import GameOver, EnemyDown, PlayerExit
 
 
-
-
 # Input / Output helpers
 def show_main_menu() -> int:
     while True:
@@ -17,6 +15,7 @@ def show_main_menu() -> int:
                 "2] Score information\n"
                 "3] Exit\n"
             ))
+        
         except ValueError:
             print("Please enter a number")
 
@@ -38,7 +37,6 @@ def is_player_winner(player_attack: str, enemy_attack: str) -> bool:
         (player_attack == settings.STONE and enemy_attack == settings.SCISSORS) or
         (player_attack == settings.SCISSORS and enemy_attack == settings.PAPER)
     )
-
 
 
 def handle_round_result(player: models.Player, enemy: models.Enemy, player_attack: str, enemy_attack: str) -> None:
@@ -77,7 +75,7 @@ def create_player() ->models.Player:
 def create_enemy() -> models.Enemy:
     mode_number = models.choose_mode()
     mode = models.create_mode(mode_number)
-    return models.Enemy(mode, settings.LEVEL)
+    return models.Enemy(mode, settings.START_LEVEL)
 
 
 def start_game() -> None:

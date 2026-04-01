@@ -4,16 +4,14 @@ from . import settings
 from game.exceptions import GameOver, EnemyDown, PlayerExit
 
 
-
 # Player
 class Player():
     def __init__(self, name: str):
         self.name = name
         self.lives = settings.LIVES 
-        # change on const settings.py
         self.score = 0
 
-# mode
+
 class Mode(ABC):
     @abstractmethod
     def attack(self,player_history=None) -> int:
@@ -24,14 +22,12 @@ class Mode(ABC):
         pass
 
 
-
 class Normal(Mode):
     def attack(self, player_history=None) -> int:
         return random.randint(1, 3)
 
     def get_enemy_lives(self, level: int) -> int:
         return level
-
 
 
 class Hard(Mode):
@@ -43,11 +39,12 @@ class Hard(Mode):
                 return random.choice((2, 3))
             case _:
                 return random.randint(1, 3)
+            
+
     def get_enemy_lives(self, level: int) -> int:
         return level + 2
-    
 
-#endregion
+
 MODES = {
     1: Normal,
     2: Hard,
@@ -61,7 +58,6 @@ def create_mode(mode_number: int) -> Mode:
     return mode_class()
 
 
-
 # Enemy
 class Enemy:
     def __init__(self, mode: Mode, level: int):
@@ -69,6 +65,7 @@ class Enemy:
         self.level = level
         self.player_history = None
         self.lives = self._calculate_lives()        
+
 
     def _calculate_lives(self) -> int:
         return self.mode.get_enemy_lives(self.level)
@@ -85,10 +82,7 @@ def choose_mode():
             print("Please enter a number")
 
 
-# Methods
-
 def player_select_attack() -> str:
-# def player_select_attack(player: Player) -> int:
     while True:
         try:
             action_choose = int(input("Choose attack: \n1] Paper \n2]Stone \n3]Scissors"))
@@ -96,10 +90,9 @@ def player_select_attack() -> str:
             if attack is not None:
                 return attack
             print("Wrong parameter")    
+
         except ValueError:
             print("Please enter a number")
-
-
 
 
 def enemy_select_attack(enemy: Enemy) -> int:
@@ -119,14 +112,14 @@ def _number_to_attack(number: int) -> str | None:
             print("Wrong parameter")
             return None
             
+
 def enemy_decrease_lives(enemy: Enemy) -> None:
-# def enemy_decrease_lives(enemy:Enemy,result:int):
-    # if result == 1:
     enemy.lives -=1
     if enemy.lives <= 0:
         enemy.level += 1
         enemy.lives = enemy._calculate_lives()
         raise EnemyDown (f"{enemy.level} Next Level\n\tEnemy Died!")
+
 
 def player_decrease_lives(player:Player) -> None:
     player.lives -= 1
@@ -134,7 +127,5 @@ def player_decrease_lives(player:Player) -> None:
         raise GameOver (f"{player.name} Died!")
 
 
-
 def player_add_score(player:Player) -> None:
     player.score += 1
-    

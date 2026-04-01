@@ -1,11 +1,7 @@
 from . import settings
 
-class PlayerRecord:
-    # def __init__(self, player_name:models.Player, enemy_mode:models.Enemy):
-    #     self.name = player_name.name
-    #     self.mode = enemy_mode.mode
-    #     self.score= player_name.score
 
+class PlayerRecord:
     def __init__(self, name: str, mode: str, score: int):
         self.name = name
         self.mode = mode
@@ -27,12 +23,9 @@ class PlayerRecord:
         return False
 
 
-
 class GameRecord:
     def __init__(self):
         self.records = []
-
-
 
     def add_record(self,new_record:PlayerRecord):
         for i,record in enumerate(self.records):
@@ -42,7 +35,6 @@ class GameRecord:
                 return
         self.records.append(new_record)
         self.prepare_records()
-
 
     def prepare_records(self):
         self.records.sort(reverse=True)
@@ -61,13 +53,12 @@ class ScoreHandler:
                 lines = f.readlines()
             for line in lines:
                 parts = line.strip().split(",")
-                
                 name =parts[0]
                 mode =parts[1]
                 score=int(parts[2])
-
                 records = PlayerRecord(name,mode,score)
                 self.game_record.add_record(records)
+                
         except FileNotFoundError:
             pass
 
@@ -79,7 +70,6 @@ class ScoreHandler:
                 line = f"{record.name},{record.mode},{record.score}\n"
                 f.write(line)
 
-        
     def display(self):
         for record in self.game_record.records:
             print(record)

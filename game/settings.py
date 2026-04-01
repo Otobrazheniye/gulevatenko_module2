@@ -1,12 +1,28 @@
 LIVES = 3
-LEVEL = 1
+START_LEVEL = 1
+MAX_SCORE = 10
 
+# Moves
 PAPER = "Paper"
 STONE = "Stone"
 SCISSORS = "Scissors"
 
-MODE_NORMAL = 'Normal'
-MODE_HARD = 'Hard'
-MODE_PROMPT = "Choose mode:\n1] Normal\n2] Hard\n"
+MOVES = {
+    "paper": PAPER,
+    "stone": STONE,
+    "scissors": SCISSORS,
+}
 
-MAX_SCORE = 10
+# Modes
+MODE_NORMAL = "Normal"
+MODE_HARD = "Hard"
+
+MODES = {
+    "1": MODE_NORMAL,
+    "2": MODE_HARD,
+}
+
+MODE_PROMPT = """Choose mode:
+1] Normal
+2] Hard
+"""

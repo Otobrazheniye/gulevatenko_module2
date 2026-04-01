@@ -1,4 +1,5 @@
 Oleg,Normal,6
+Andrii,Hard,5
+Andrii,Normal,3
 Oleg,Hard,2
 Juliana,Normal,1
-Andrii,Hard,0
