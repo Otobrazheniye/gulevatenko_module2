@@ -8,9 +8,10 @@ class Game:
     def __init__(self):
         self.player = None
         self.enemy = None
-    
+        self.gameui = GameUI()
+        
     def create_player(self) ->models.Player:
-        name = GameUI.ask_player_name()
+        name = self.gameui.ask_player_name()
         return models.Player(name)
 
     def create_enemy(self) -> models.Enemy:
@@ -42,7 +43,6 @@ class Game:
 
             except GameOver as e:
                 print(e)
-                # print(f"Final score: {player.score}")
                 player_record = score.PlayerRecord(self.player.name,self.enemy.mode.__class__.__name__,self.player.score)
                 total_board = score.ScoreHandler("score_board.txt")
                 total_board.game_record.add_record(player_record)
@@ -83,7 +83,7 @@ class Game:
         total_board = score.ScoreHandler("score_board.txt")
         total_board.display()
      
-    def is_player_winner(player_attack: str, enemy_attack: str) -> bool:
+    def is_player_winner(self,player_attack: str, enemy_attack: str) -> bool:
         return (
             (player_attack == settings.PAPER and enemy_attack == settings.STONE) or
             (player_attack == settings.STONE and enemy_attack == settings.SCISSORS) or
@@ -91,7 +91,7 @@ class Game:
         )
 
 class GameUI:
-    def show_main_menu() -> int:
+    def show_main_menu(self) -> int:
         while True:
             try:
                 return int(input(
@@ -106,5 +106,5 @@ class GameUI:
                 print("Please enter a number")
 
 
-    def ask_player_name() -> str:
+    def ask_player_name(self) -> str:
         return input("Enter player name: ")
