@@ -90,3 +90,4 @@ class ScoreHandler:
     def display(self):
         for record in self.game_record.records:
             print(record)
+

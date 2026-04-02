@@ -5,3 +5,4 @@ Mindi,Hard,4
 Andrii,Normal,3
 Oleg,Hard,2
 Juliana,Normal,1
+Mindi,Normal,1

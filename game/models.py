@@ -80,6 +80,10 @@ class Enemy:
             self.level += 1
             self.lives = self._calculate_lives()
             raise EnemyDown (f"{self.level} Next Level\n\tEnemy Died!")
+        
+    def enemy_select_attack(self) -> int:
+        enemy_action = self.mode.attack(self.player_history)
+        return _number_to_attack(enemy_action)
 
 
     def _calculate_lives(self) -> int:
@@ -110,11 +114,8 @@ def player_select_attack() -> str:
             print("Please enter a number")
 
 
-def enemy_select_attack(enemy: Enemy) -> int:
-    enemy_action = enemy.mode.attack(enemy.player_history)
-    return _number_to_attack(enemy_action)
 
-        
+# util
 def _number_to_attack(number: int) -> str | None:
     match number:
         case 1:
