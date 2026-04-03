@@ -90,31 +90,6 @@ class Enemy:
         return self.mode.get_enemy_lives(self.level)
 
 
-def choose_mode():
-    while True:
-        try:
-            mode = int(input(settings.MODE_PROMPT))
-            if mode in MODES:
-                return mode
-            print("Enter correct num")
-        except ValueError:
-            print("Please enter a number")
-
-
-def player_select_attack() -> str:
-    while True:
-        try:
-            action_choose = int(input("Choose attack: \n1] Paper \n2]Stone \n3]Scissors"))
-            attack = _number_to_attack(action_choose)
-            if attack is not None:
-                return attack
-            print("Wrong parameter")    
-
-        except ValueError:
-            print("Please enter a number")
-
-
-
 # util
 def _number_to_attack(number: int) -> str | None:
     match number:

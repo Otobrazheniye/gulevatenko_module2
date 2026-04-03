@@ -15,7 +15,7 @@ class Game:
         return models.Player(name)
 
     def create_enemy(self) -> models.Enemy:
-        mode_number = models.choose_mode()
+        mode_number = self.gameui.choose_mode()
         mode = models.create_mode(mode_number)
         return models.Enemy(mode, settings.START_LEVEL)
 
@@ -51,7 +51,7 @@ class Game:
             
     def play_round(self) -> None:
         self.print_round_info()
-        player_attack = models.player_select_attack()
+        player_attack = self.gameui.player_select_attack()
         self.enemy.player_history = player_attack
         enemy_attack = self.enemy.enemy_select_attack()
 
@@ -108,3 +108,26 @@ class GameUI:
 
     def ask_player_name(self) -> str:
         return input("Enter player name: ")
+
+
+    def player_select_attack(self) -> str:
+        while True:
+            try:
+                action_choose = int(input("Choose attack: \n1] Paper \n2]Stone \n3]Scissors"))
+                attack = models._number_to_attack(action_choose)
+                if attack is not None:
+                    return attack
+                print("Wrong parameter")    
+
+            except ValueError:
+                print("Please enter a number")
+    
+    def choose_mode(self):
+        while True:
+            try:
+                mode = int(input(settings.MODE_PROMPT))
+                if mode in models.MODES:
+                    return mode
+                print("Enter correct num")
+            except ValueError:
+                print("Please enter a number")
