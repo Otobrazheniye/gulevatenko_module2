@@ -11,5 +11,11 @@
   "test_game.py::test_gt_logic[players-tplayers_score0]": true,
   "test_game.py::test_all_records_types": true,
   "test_game.py::test_fight_win[Paper-Stone]": true,
-  "test_game.py::test_fight_lose[Scissors-Stone]": true
+  "test_game.py::test_fight_lose[Scissors-Stone]": true,
+  "test_game.py::test_select_attack[1-expected_attacks0]": true,
+  "test_game.py::test_select_attack[2-expected_attacks1]": true,
+  "test_game.py::test_select_attack[3-expected_attacks2]": true,
+  "test_game.py::test_fight_draw[Paper-Paper]": true,
+  "test_game.py::test_create_enemy[1-Normal]": true,
+  "test_game.py::test_create_enemy[2-Hard]": true
 }
