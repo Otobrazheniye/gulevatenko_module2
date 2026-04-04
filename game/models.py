@@ -43,8 +43,10 @@ class Hard(Mode):
         match player_history:
             case 1:
                 return random.choice((1, 2))
-            case 2 | 3:
+            case 2:
                 return random.choice((2, 3))
+            case 3:
+                return random.choice((1, 3))
             case _:
                 return random.randint(1, 3)
             

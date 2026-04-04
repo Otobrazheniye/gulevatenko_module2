@@ -68,10 +68,10 @@ def test_enemy_lives(mode, level, expected_lives):
     ]
 )
 def test_select_attack(player_history, expected_attacks):
-    tenemy = Enemy(Hard(), 1)
+    tenemy = Enemy(Hard(), 3)
     tenemy.player_history = player_history
 
-    enemy_attack = enemy_select_attack(tenemy)
+    enemy_attack = Enemy.enemy_select_attack(tenemy)
 
     assert enemy_attack in expected_attacks
 
@@ -89,12 +89,13 @@ def test_enemy_decrease_lives(lives,expected_exception):
 def test_fight_draw(tplayer_attack, tenemy_attack):
     tplayer = Player("test_Andrii")
     tenemy = Enemy(Hard(), 1)
+    game = Game(tplayer,tenemy)
 
     start_player_lives = tplayer.lives
     start_enemy_lives = tenemy.lives
     start_score = tplayer.score
 
-    handle_round_result(tplayer, tenemy, tplayer_attack, tenemy_attack)
+    game.handle_round_result(tplayer_attack, tenemy_attack)
 
     assert tplayer.lives == start_player_lives
     assert tenemy.lives == start_enemy_lives
@@ -104,12 +105,13 @@ def test_fight_draw(tplayer_attack, tenemy_attack):
 def test_fight_win(tplayer_attack,tenemy_attack):
     tplayer = Player("test_Andrii")
     tenemy = Enemy(Hard(),1)
+    game = Game(tplayer,tenemy)
 
     start_player_lives = tplayer.lives
     start_enemy_lives = tenemy.lives
     start_score = tplayer.score
 
-    handle_round_result(tplayer,tenemy,tplayer_attack,tenemy_attack)
+    game.handle_round_result(tplayer_attack,tenemy_attack)
     assert tplayer.lives == start_player_lives
     assert tenemy.lives < start_enemy_lives
     assert tplayer.score > start_score
@@ -119,12 +121,13 @@ def test_fight_win(tplayer_attack,tenemy_attack):
 def test_fight_lose(tplayer_attack,tenemy_attack):
     tplayer = Player("test_Andrii")
     tenemy = Enemy(Hard(),1)
+    game = Game(tplayer,tenemy)
 
     start_player_lives = tplayer.lives
     start_enemy_lives = tenemy.lives
     start_score = tplayer.score
 
-    handle_round_result(tplayer,tenemy,tplayer_attack,tenemy_attack)
+    game.handle_round_result(tplayer_attack,tenemy_attack)
     assert tplayer.lives < start_player_lives
     assert tenemy.lives == start_enemy_lives
     assert tplayer.score == start_score
@@ -139,9 +142,9 @@ def test_fight_lose(tplayer_attack,tenemy_attack):
     ]
 )
 def test_create_enemy(monkeypatch, mode_number, expected_mode):
-    monkeypatch.setattr(models, "choose_mode", lambda: mode_number)
-
-    enemy = create_enemy()
+    monkeypatch.setattr(GameUI, "choose_mode", lambda self: mode_number)
+    game = Game()
+    enemy = game.create_enemy()
     assert enemy.level == settings.START_LEVEL
     assert isinstance(enemy.mode, expected_mode)
 

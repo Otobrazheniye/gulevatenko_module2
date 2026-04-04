@@ -5,9 +5,9 @@ from .exceptions import GameOver, EnemyDown, PlayerExit
 
 
 class Game:
-    def __init__(self):
-        self.player = None
-        self.enemy = None
+    def __init__(self, player=None, enemy=None):
+        self.player = player
+        self.enemy = enemy
         self.gameui = GameUI()
         
     def create_player(self) ->models.Player:
