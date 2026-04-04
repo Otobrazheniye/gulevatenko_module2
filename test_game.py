@@ -1,30 +1,55 @@
 from game.score import *
 from game.models import *
 from game.game import *
-
 import pytest
 
 
 # <!-------- PLAYER ---------!>
-@pytest.mark.parametrize(
-    "name, lives, score",
+class TestPlayer:
+    @pytest.mark.parametrize(
+        "name",
     [
-        ("Oleg", 3, 0),
+        "Oleg","Solomia","Elisabeth"
     ]
 )
-def test_create_player(name, lives, score):
-    tplayer = Player(name)
+    def test_create_player_happy_path(self,name):
+        tplayer = Player(name)
 
-    assert tplayer.name == name
-    assert tplayer.lives == lives
-    assert tplayer.score == score
+        assert tplayer.name == name
+        assert tplayer.lives == settings.LIVES
+        assert tplayer.score == 0
 
 
-@pytest.mark.parametrize("score",[0])
-def test_add_score(score):
-    tplayer = Player("test_Andrii")
-    Player.player_add_score(tplayer)
-    assert tplayer.score == score + 1 
+    @pytest.mark.parametrize(
+        "name",
+        [
+            "","S", " ","Andrii" * 100, "31/.@##!&^"
+        ]
+    )
+    def test_create_player_edge_cases(self,name):
+        tplayer = Player(name)
+
+        assert tplayer.name == name
+        assert tplayer.lives == settings.LIVES
+        assert tplayer.score == 0
+
+
+
+
+
+    @pytest.mark.parametrize("score",[0])
+    def test_add_score_happy_path(self,score):
+        tplayer = Player("test_Andrii")
+        Player.player_add_score(tplayer)
+        assert tplayer.score == score + 1 
+
+
+    # @pytest.mark.parametrize("score",[2])
+    # def test_add_score_happy_path(score):
+    #     tplayer = Player("test_Andrii")
+    #     Player.player_add_score(tplayer)
+    #     assert tplayer.score == score + 1 
+
 
 @pytest.mark.parametrize("lives",[3])
 def test_decrease_lives(lives):
@@ -244,3 +269,4 @@ def test_save_records(tmp_path):
         "Andrii,Hard,10",
         "Oleg,Normal,5",
     ]
+
