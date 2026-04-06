@@ -44,19 +44,31 @@ class TestPlayer:
         assert tplayer.score == score + 1 
 
 
-    # @pytest.mark.parametrize("score",[2])
-    # def test_add_score_happy_path(score):
-    #     tplayer = Player("test_Andrii")
-    #     Player.player_add_score(tplayer)
-    #     assert tplayer.score == score + 1 
+    @pytest.mark.parametrize("score",[0,-1,1,999999])
+    def test_add_score_edge_cases(self,score):
+        tplayer = Player("test_Andrii")
+        tplayer.score = score
+        tplayer.player_add_score()
+        assert tplayer.score == score + 1
 
 
-@pytest.mark.parametrize("lives",[3])
-def test_decrease_lives(lives):
-    tplayer = Player("test_Andrii")
-    tplayer.lives = lives
-    Player.player_decrease_lives(tplayer)
-    assert tplayer.lives == lives - 1
+
+
+    @pytest.mark.parametrize("lives",[2,100,999999])
+    def test_decrease_lives_happy_path(self,lives):
+        tplayer = Player("test_Andrii")
+        tplayer.lives = lives
+        tplayer.player_decrease_lives()
+        assert tplayer.lives == lives - 1
+    
+    @pytest.mark.parametrize("lives",[0,1])
+    def test_decrease_lives_edge_cases(self,lives):
+        tplayer = Player("test_Andrii")
+        tplayer.lives = lives
+        with pytest.raises(GameOver):
+            tplayer.player_decrease_lives()
+
+
 
 @pytest.mark.parametrize("expected_exception, lives",[(GameOver,1)])
 def test_decrease_game_over(expected_exception,lives):
