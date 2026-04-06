@@ -7,7 +7,11 @@ from game.exceptions import GameOver, EnemyDown, PlayerExit
 # Player
 class Player:
     def __init__(self, name: str):
-        self.name = name
+        if not isinstance(name,str):
+            raise TypeError("Name must be string")
+        if name.strip() == "":
+            raise ValueError("can't be empty")
+        self.name = name.strip()
         self.lives = settings.LIVES 
         self.score = 0
 
@@ -17,6 +21,10 @@ class Player:
             raise GameOver (f"{self.name} Died!")
 
     def player_add_score(self) -> None:
+        if not isinstance(self.score, int):
+            raise TypeError("Must be a correct number")
+        if self.score < 0:
+            self.score = 0
         self.score += 1
 
 

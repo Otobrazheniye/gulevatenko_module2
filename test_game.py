@@ -3,6 +3,8 @@ from game.models import *
 from game.game import *
 import pytest
 
+# Happy Path, Edge Cases / Boundary Cases, Smoke Tests, Negative Cases,Exception Tests
+# Integration Tests
 
 # <!-------- PLAYER ---------!>
 class TestPlayer:
@@ -23,10 +25,10 @@ class TestPlayer:
     @pytest.mark.parametrize(
         "name",
         [
-            "","S", " ","Andrii" * 100, "31/.@##!&^"
+            "S", "Andrii" * 100, "31/.@##!&^"
         ]
     )
-    def test_create_player_edge_cases(self,name):
+    def test_create_player_edge_case(self,name):
         tplayer = Player(name)
 
         assert tplayer.name == name
@@ -34,22 +36,65 @@ class TestPlayer:
         assert tplayer.score == 0
 
 
+    def test_create_player_negative_case(self):
+        tplayer = Player("   Oleg    ")
+        assert tplayer.name == "Oleg"
+
+
+    @pytest.mark.parametrize(
+        "name",
+        [
+            None, [], {}
+        ]
+    )
+    def test_create_player_exception_case_type(self,name):
+
+        with pytest.raises(TypeError):
+            Player(name)
+        
+
+    @pytest.mark.parametrize(
+        "name",
+        [
+            "", " "
+        ]
+    )
+    def test_create_player_exception_case_value(self,name):
+
+        with pytest.raises(ValueError):
+            Player(name)
 
 
 
-    @pytest.mark.parametrize("score",[0])
+
+    @pytest.mark.parametrize("score",[0,4,8])
     def test_add_score_happy_path(self,score):
         tplayer = Player("test_Andrii")
+        tplayer.score = score
         Player.player_add_score(tplayer)
         assert tplayer.score == score + 1 
 
-
-    @pytest.mark.parametrize("score",[0,-1,1,999999])
-    def test_add_score_edge_cases(self,score):
+    @pytest.mark.parametrize("score",[0,1,999999])
+    def test_add_score_edge_case(self,score):
         tplayer = Player("test_Andrii")
         tplayer.score = score
         tplayer.player_add_score()
         assert tplayer.score == score + 1
+
+    def test_add_score_negative_case(self):
+        tplayer = Player("test_Andrii")
+        tplayer.score = -5
+        tplayer.player_add_score()
+        assert tplayer.score == 1
+
+    @pytest.mark.parametrize("score",[None,[],{}])
+    def test_add_score_exception_case(self,score):
+        tplayer = Player("test_Andrii")
+        tplayer.score = score
+
+        with pytest.raises(TypeError):
+            tplayer.player_add_score()
+           
 
 
 
@@ -61,25 +106,17 @@ class TestPlayer:
         tplayer.player_decrease_lives()
         assert tplayer.lives == lives - 1
     
-    @pytest.mark.parametrize("lives",[0,1])
-    def test_decrease_lives_edge_cases(self,lives):
+    @pytest.mark.parametrize("expected_exception, lives",[(GameOver,1),(GameOver,0)])
+    def test_decrease_lives_exception_test(self,expected_exception,lives):
         tplayer = Player("test_Andrii")
         tplayer.lives = lives
-        with pytest.raises(GameOver):
+        with pytest.raises(expected_exception):
             tplayer.player_decrease_lives()
 
 
 
-@pytest.mark.parametrize("expected_exception, lives",[(GameOver,1)])
-def test_decrease_game_over(expected_exception,lives):
-    tplayer = Player("test_Andrii")
-    tplayer.lives = lives
-    with pytest.raises(expected_exception):
-        Player.player_decrease_lives(tplayer)        
-
 
 # <!-------- ENEMY ---------!>
-
 @pytest.mark.parametrize(
     "mode, level, expected_lives",
     [
