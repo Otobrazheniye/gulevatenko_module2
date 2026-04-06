@@ -8,26 +8,25 @@ import pytest
 
 # <!-------- PLAYER ---------!>
 class TestPlayer:
-    @pytest.mark.parametrize(
-        "name",
-    [
-        "Oleg","Solomia","Elisabeth"
-    ]
-)
+    def test_create_player_smoke_test(self):
+        tplayer = Player("test_Andrii")
+        assert tplayer is not None
+
+
+    @pytest.mark.parametrize("name",["Oleg","Solomia","Elisabeth"])
     def test_create_player_happy_path(self,name):
         tplayer = Player(name)
 
         assert tplayer.name == name
+
+
+    def test_create_player_happy_path_init(self):
+        tplayer = Player("Andrii_test")
         assert tplayer.lives == settings.LIVES
         assert tplayer.score == 0
 
 
-    @pytest.mark.parametrize(
-        "name",
-        [
-            "S", "Andrii" * 100, "31/.@##!&^"
-        ]
-    )
+    @pytest.mark.parametrize("name",["S", "Andrii" * 100, "31/.@##!&^"])
     def test_create_player_edge_case(self,name):
         tplayer = Player(name)
 
@@ -38,56 +37,51 @@ class TestPlayer:
 
     def test_create_player_negative_case(self):
         tplayer = Player("   Oleg    ")
+
         assert tplayer.name == "Oleg"
 
 
-    @pytest.mark.parametrize(
-        "name",
-        [
-            None, [], {}
-        ]
-    )
+    @pytest.mark.parametrize("name",[None, [], {}])
     def test_create_player_exception_case_type(self,name):
 
-        with pytest.raises(TypeError):
+        with pytest.raises(TypeError, match="Name must be string"):
             Player(name)
         
 
-    @pytest.mark.parametrize(
-        "name",
-        [
-            "", " "
-        ]
-    )
+    @pytest.mark.parametrize("name",[ "", " "])
     def test_create_player_exception_case_value(self,name):
 
         with pytest.raises(ValueError):
             Player(name)
 
 
-
-
-    @pytest.mark.parametrize("score",[0,4,8])
+    @pytest.mark.parametrize("score",[1,4,8])
     def test_add_score_happy_path(self,score):
         tplayer = Player("test_Andrii")
         tplayer.score = score
-        Player.player_add_score(tplayer)
+        tplayer.player_add_score()
+
         assert tplayer.score == score + 1 
 
-    @pytest.mark.parametrize("score",[0,1,999999])
+
+    @pytest.mark.parametrize("score",[0,999999])
     def test_add_score_edge_case(self,score):
         tplayer = Player("test_Andrii")
         tplayer.score = score
         tplayer.player_add_score()
+
         assert tplayer.score == score + 1
+
 
     def test_add_score_negative_case(self):
         tplayer = Player("test_Andrii")
         tplayer.score = -5
         tplayer.player_add_score()
+
         assert tplayer.score == 1
 
-    @pytest.mark.parametrize("score",[None,[],{}])
+
+    @pytest.mark.parametrize("score",[None,[],{},3.14,"5"])
     def test_add_score_exception_case(self,score):
         tplayer = Player("test_Andrii")
         tplayer.score = score
@@ -96,21 +90,38 @@ class TestPlayer:
             tplayer.player_add_score()
            
 
-
-
-
-    @pytest.mark.parametrize("lives",[2,100,999999])
+    @pytest.mark.parametrize("lives",[2,5,10])
     def test_decrease_lives_happy_path(self,lives):
         tplayer = Player("test_Andrii")
         tplayer.lives = lives
         tplayer.player_decrease_lives()
+
         assert tplayer.lives == lives - 1
     
-    @pytest.mark.parametrize("expected_exception, lives",[(GameOver,1),(GameOver,0)])
-    def test_decrease_lives_exception_test(self,expected_exception,lives):
+
+    @pytest.mark.parametrize("lives",[2,99999])
+    def test_decrease_lives_edge_cases(self,lives):
         tplayer = Player("test_Andrii")
         tplayer.lives = lives
-        with pytest.raises(expected_exception):
+        tplayer.player_decrease_lives()
+
+        assert tplayer.lives == lives - 1
+
+
+    @pytest.mark.parametrize("lives",[-20,-1,0])
+    def test_decrease_lives_negative_cases(self,lives):
+        tplayer = Player("test_Andrii")
+        tplayer.lives = lives
+
+        with pytest.raises(GameOver):
+            tplayer.player_decrease_lives()
+
+
+    def test_decrease_lives_exception_test(self):
+        tplayer = Player("test_Andrii")
+        tplayer.lives = 1
+
+        with pytest.raises(GameOver):
             tplayer.player_decrease_lives()
 
 
