@@ -55,8 +55,10 @@ class Hard(Mode):
                 return random.choice((2, 3))
             case 3:
                 return random.choice((1, 3))
-            case _:
+            case None:
                 return random.randint(1, 3)
+            case _:
+                raise ValueError(f"Invalid player history: {player_history}")
             
 
     def get_enemy_lives(self, level: int) -> int:
@@ -79,8 +81,15 @@ def create_mode(mode_number: int) -> Mode:
 # Enemy
 class Enemy:
     def __init__(self, mode: Mode, level: int):
+        if not isinstance(mode,Mode):
+            raise TypeError("mode must be an instance of Mode")
+        if not isinstance(level,int):
+            raise TypeError("level must be an integer")
+        if level <= 0:
+            self.level = 1
+        else:
+           self.level = level 
         self.mode = mode
-        self.level = level
         self.player_history = None
         self.lives = self._calculate_lives()        
 
@@ -110,5 +119,4 @@ def _number_to_attack(number: int) -> str | None:
         case 3:
             return settings.SCISSORS
         case _:
-            print("Wrong parameter")
-            return None
+            raise ValueError(f"Invalid attack number: {number}")

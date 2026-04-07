@@ -1,7 +1,9 @@
 from game.score import *
 from game.models import *
 from game.game import *
+from game.models import _number_to_attack
 import pytest
+
 
 # Happy Path, Edge Cases / Boundary Cases, Smoke Tests, Negative Cases,Exception Tests
 # Integration Tests
@@ -109,7 +111,7 @@ class TestPlayer:
 
 
     @pytest.mark.parametrize("lives",[-20,-1,0])
-    def test_decrease_lives_negative_cases(self,lives):
+    def test_decrease_lives_negative_case(self,lives):
         tplayer = Player("test_Andrii")
         tplayer.lives = lives
 
@@ -125,40 +127,100 @@ class TestPlayer:
             tplayer.player_decrease_lives()
 
 
-
-
 # <!-------- ENEMY ---------!>
-@pytest.mark.parametrize(
-    "mode, level, expected_lives",
-    [
-        (Normal(), 1, 1),
-        (Normal(), 3, 3),
-        (Hard(), 1, 3),
-        (Hard(), 2, 4),
-    ]
-)
-def test_enemy_lives(mode, level, expected_lives):
-    tenemy = Enemy(mode, level)
-
-    assert tenemy.lives == expected_lives
+class TestEnemy:
+    def test_enemy_happy_path_init(self):
+        tenemy = Enemy(Hard(),3)
+        assert tenemy is not None
 
 
-@pytest.mark.parametrize(
-    "player_history, expected_attacks",
-    [
-        (1, {settings.PAPER, settings.STONE}),
-        (2, {settings.STONE, settings.SCISSORS}),
-        (3, {settings.PAPER, settings.SCISSORS}),
-        # error
-    ]
-)
-def test_select_attack(player_history, expected_attacks):
-    tenemy = Enemy(Hard(), 3)
-    tenemy.player_history = player_history
+    @pytest.mark.parametrize("mode_number, expected_mode",[(1, models.Normal),(2, models.Hard),])
+    def test_create_enemy_happy_path(self,monkeypatch, mode_number, expected_mode):
+        monkeypatch.setattr(GameUI, "choose_mode", lambda self: mode_number)
+        game = Game()
+        enemy = game.create_enemy()
 
-    enemy_attack = Enemy.enemy_select_attack(tenemy)
+        assert enemy.level == settings.START_LEVEL
+        assert isinstance(enemy.mode, expected_mode)
 
-    assert enemy_attack in expected_attacks
+
+    @pytest.mark.parametrize("mode_number, expected_mode",[(1, models.Normal),(2, models.Hard),])
+    def test_create_enemy_edge_case(self,monkeypatch, mode_number, expected_mode):
+        monkeypatch.setattr(GameUI, "choose_mode", lambda self: mode_number)
+        game = Game()
+        enemy = game.create_enemy()
+        
+        assert enemy.level == settings.START_LEVEL
+        assert isinstance(enemy.mode, expected_mode)
+
+
+    @pytest.mark.parametrize("mode", [None, [], "dsdsd", {}])
+    def test_create_enemy_exception_case_type_mode(self, mode):
+        with pytest.raises(TypeError):
+            Enemy(mode, 3)
+
+
+    @pytest.mark.parametrize("level", [None, [], "dsdsd", {}])
+    def test_create_enemy_exception_case_type_level(self, level):
+        with pytest.raises(TypeError):
+            Enemy(Hard(),level)
+
+    
+    @pytest.mark.parametrize("level", [-1, 0, -9999])
+    def test_create_enemy_negative_case_level(self, level):
+        tenemy = Enemy(Hard(), level)
+        assert tenemy.level == 1
+
+
+    @pytest.mark.parametrize("mode, level, expected_lives",[(Normal(), 2, 2),
+        (Normal(), 4, 4),(Hard(), 5, 7),(Hard(), 6, 8)])
+    def test_enemy_lives_happy_path(self,mode, level, expected_lives):
+        tenemy = Enemy(mode, level)
+
+        assert tenemy.lives == expected_lives
+
+
+    @pytest.mark.parametrize("mode, level, expected_lives",[(Normal(), 1, 1),
+        (Normal(), 9999, 9999),(Hard(), 1, 3),(Hard(),9997, 9999)])
+    def test_enemy_lives_edge_case(self,mode, level, expected_lives):
+        tenemy = Enemy(mode, level)
+
+        assert tenemy.lives == expected_lives
+
+
+    @pytest.mark.parametrize("player_history, expected_attacks",[(1, {settings.PAPER, settings.STONE}),
+        (2, {settings.STONE, settings.SCISSORS}),(3, {settings.PAPER, settings.SCISSORS}),])
+    def test_select_attack_happy_path(self,player_history, expected_attacks):
+        tenemy = Enemy(Hard(), 3)
+        tenemy.player_history = player_history
+        enemy_attack = tenemy.enemy_select_attack()
+
+        assert enemy_attack in expected_attacks
+
+
+    def test_select_attack_edge_case(self):
+        tenemy = Enemy(Hard(), 3)
+        tenemy.player_history = None
+        enemy_attack = tenemy.enemy_select_attack()
+
+        assert enemy_attack in {
+            settings.PAPER,
+            settings.SCISSORS,
+            settings.STONE
+        }
+
+
+    @pytest.mark.parametrize("player_history",["snake"])
+    def test_select_attack_negative_case(self,player_history):
+        tenemy = Enemy(Hard(),5)
+        tenemy.player_history = player_history
+        
+        with pytest.raises(ValueError):
+            tenemy.enemy_select_attack()
+
+
+
+
 
 @pytest.mark.parametrize("lives,expected_exception",[(1,EnemyDown)])
 def test_enemy_decrease_lives(lives,expected_exception):
@@ -219,19 +281,8 @@ def test_fight_lose(tplayer_attack,tenemy_attack):
 
 
 
-@pytest.mark.parametrize(
-    "mode_number, expected_mode",
-    [
-        (1, models.Normal),
-        (2, models.Hard),
-    ]
-)
-def test_create_enemy(monkeypatch, mode_number, expected_mode):
-    monkeypatch.setattr(GameUI, "choose_mode", lambda self: mode_number)
-    game = Game()
-    enemy = game.create_enemy()
-    assert enemy.level == settings.START_LEVEL
-    assert isinstance(enemy.mode, expected_mode)
+
+
 
 # <!-------- PlayerRecord ---------!>
 

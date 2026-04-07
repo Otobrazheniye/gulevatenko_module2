@@ -5,6 +5,6 @@ Lili,Normal,5
 Mia,Hard,4
 Mindi,Hard,4
 Oleg,Hard,4
+Roman,Hard,4
 Andrii,Normal,3
 Andrii,Hard,3
-Darek,Normal,2
