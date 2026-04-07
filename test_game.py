@@ -211,7 +211,7 @@ class TestEnemy:
 
 
     @pytest.mark.parametrize("player_history",["snake"])
-    def test_select_attack_negative_case(self,player_history):
+    def test_select_attack_exception_case(self,player_history):
         tenemy = Enemy(Hard(),5)
         tenemy.player_history = player_history
         
@@ -219,18 +219,15 @@ class TestEnemy:
             tenemy.enemy_select_attack()
 
 
+    @pytest.mark.parametrize("lives,expected_exception",[(1,EnemyDown)])
+    def test_enemy_decrease_lives_exception_case(self,lives,expected_exception):
+        tenemy = Enemy(Hard(),1)
+        tenemy.lives = lives
+        with pytest.raises(expected_exception):
+            Enemy.enemy_decrease_lives(tenemy)
 
-
-
-@pytest.mark.parametrize("lives,expected_exception",[(1,EnemyDown)])
-def test_enemy_decrease_lives(lives,expected_exception):
-    tenemy = Enemy(Hard(),1)
-    tenemy.lives = lives
-    with pytest.raises(expected_exception):
-        Enemy.enemy_decrease_lives(tenemy)
 
 # <!-------- Game ---------!>
-
 @pytest.mark.parametrize(
     "tplayer_attack, tenemy_attack",[(settings.PAPER, settings.PAPER)])
 def test_fight_draw(tplayer_attack, tenemy_attack):

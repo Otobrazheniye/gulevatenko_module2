@@ -104,7 +104,6 @@ class Enemy:
         enemy_action = self.mode.attack(self.player_history)
         return _number_to_attack(enemy_action)
 
-
     def _calculate_lives(self) -> int:
         return self.mode.get_enemy_lives(self.level)
 
