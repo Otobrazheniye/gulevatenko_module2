@@ -58,6 +58,12 @@ class Game:
         self.handle_round_result( player_attack, enemy_attack)
 
     def handle_round_result(self, player_attack: str, enemy_attack: str) -> None:
+        valid_attacks = {settings.PAPER, settings.SCISSORS, settings.STONE}
+        if not isinstance(player_attack,str) or not isinstance(enemy_attack,str):
+            raise TypeError("Uncorrect type attack")
+        if player_attack not in valid_attacks or enemy_attack not in valid_attacks:
+            raise ValueError("Uncorrect word attack")
+
         print(f"Player attack: {player_attack}")
         print(f"Enemy attack: {enemy_attack}")
 

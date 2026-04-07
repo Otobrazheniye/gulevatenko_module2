@@ -228,61 +228,73 @@ class TestEnemy:
 
 
 # <!-------- Game ---------!>
-@pytest.mark.parametrize(
-    "tplayer_attack, tenemy_attack",[(settings.PAPER, settings.PAPER)])
-def test_fight_draw(tplayer_attack, tenemy_attack):
-    tplayer = Player("test_Andrii")
-    tenemy = Enemy(Hard(), 1)
-    game = Game(tplayer,tenemy)
+class TestGame:
+    @pytest.mark.parametrize("tplayer_attack, tenemy_attack",[(settings.PAPER, settings.PAPER)])
+    def test_fight_draw_happy_path(self,tplayer_attack, tenemy_attack):
+        tplayer = Player("test_Andrii")
+        tenemy = Enemy(Hard(), 1)
+        game = Game(tplayer,tenemy)
+        start_player_lives = tplayer.lives
+        start_enemy_lives = tenemy.lives
+        start_score = tplayer.score
+        game.handle_round_result(tplayer_attack, tenemy_attack)
 
-    start_player_lives = tplayer.lives
-    start_enemy_lives = tenemy.lives
-    start_score = tplayer.score
-
-    game.handle_round_result(tplayer_attack, tenemy_attack)
-
-    assert tplayer.lives == start_player_lives
-    assert tenemy.lives == start_enemy_lives
-    assert tplayer.score == start_score
-
-@pytest.mark.parametrize("tplayer_attack, tenemy_attack",[(settings.PAPER, settings.STONE)])
-def test_fight_win(tplayer_attack,tenemy_attack):
-    tplayer = Player("test_Andrii")
-    tenemy = Enemy(Hard(),1)
-    game = Game(tplayer,tenemy)
-
-    start_player_lives = tplayer.lives
-    start_enemy_lives = tenemy.lives
-    start_score = tplayer.score
-
-    game.handle_round_result(tplayer_attack,tenemy_attack)
-    assert tplayer.lives == start_player_lives
-    assert tenemy.lives < start_enemy_lives
-    assert tplayer.score > start_score
+        assert tplayer.lives == start_player_lives
+        assert tenemy.lives == start_enemy_lives
+        assert tplayer.score == start_score
 
 
-@pytest.mark.parametrize("tplayer_attack, tenemy_attack",[(settings.SCISSORS, settings.STONE)])
-def test_fight_lose(tplayer_attack,tenemy_attack):
-    tplayer = Player("test_Andrii")
-    tenemy = Enemy(Hard(),1)
-    game = Game(tplayer,tenemy)
+    @pytest.mark.parametrize("tplayer_attack, tenemy_attack",[(settings.PAPER, settings.STONE)])
+    def test_fight_win(self,tplayer_attack,tenemy_attack):
+        tplayer = Player("test_Andrii")
+        tenemy = Enemy(Hard(),1)
+        game = Game(tplayer,tenemy)
+        start_player_lives = tplayer.lives
+        start_enemy_lives = tenemy.lives
+        start_score = tplayer.score
+        game.handle_round_result(tplayer_attack,tenemy_attack)
 
-    start_player_lives = tplayer.lives
-    start_enemy_lives = tenemy.lives
-    start_score = tplayer.score
-
-    game.handle_round_result(tplayer_attack,tenemy_attack)
-    assert tplayer.lives < start_player_lives
-    assert tenemy.lives == start_enemy_lives
-    assert tplayer.score == start_score
-
+        assert tplayer.lives == start_player_lives
+        assert tenemy.lives < start_enemy_lives
+        assert tplayer.score > start_score
 
 
+    @pytest.mark.parametrize("tplayer_attack, tenemy_attack",[(settings.SCISSORS, settings.STONE)])
+    def test_fight_lose(self,tplayer_attack,tenemy_attack):
+        tplayer = Player("test_Andrii")
+        tenemy = Enemy(Hard(),1)
+        game = Game(tplayer,tenemy)
+        start_player_lives = tplayer.lives
+        start_enemy_lives = tenemy.lives
+        start_score = tplayer.score
+        game.handle_round_result(tplayer_attack,tenemy_attack)
+    
+        assert tplayer.lives < start_player_lives
+        assert tenemy.lives == start_enemy_lives
+        assert tplayer.score == start_score
 
+
+    @pytest.mark.parametrize("tplayer_attack, tenemy_attack",[({}, settings.PAPER),(None, settings.STONE),(123, settings.SCISSORS)])
+    def test_fight_draw_exception_case_handle_round_type(self,tplayer_attack, tenemy_attack):
+        tplayer = Player("test_Andrii")
+        tenemy = Enemy(Hard(), 1)
+        game = Game(tplayer,tenemy)
+       
+        with pytest.raises(TypeError):
+            game.handle_round_result(tplayer_attack, tenemy_attack)
+
+
+    @pytest.mark.parametrize("tplayer_attack, tenemy_attack",[("", settings.PAPER),("Snake", settings.STONE),("Oleg", settings.SCISSORS)])
+    def test_fight_draw_exception_case_handle_round_value(self,tplayer_attack, tenemy_attack):
+        tplayer = Player("test_Andrii")
+        tenemy = Enemy(Hard(), 1)
+        game = Game(tplayer,tenemy)
+       
+        with pytest.raises(ValueError):
+            game.handle_round_result(tplayer_attack, tenemy_attack)
 
 
 # <!-------- PlayerRecord ---------!>
-
 def test_sort_records():
     records = [
         score.PlayerRecord("A", "Normal", 10),
