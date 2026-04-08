@@ -10,7 +10,7 @@ import pytest
 
 # <!-------- PLAYER ---------!>
 class TestPlayer:
-    def test_create_player_smoke_test(self):
+    def test_create_player_smoke(self):
         tplayer = Player("test_Andrii")
         assert tplayer is not None
 
@@ -245,7 +245,7 @@ class TestGame:
 
 
     @pytest.mark.parametrize("tplayer_attack, tenemy_attack",[(settings.PAPER, settings.STONE)])
-    def test_fight_win(self,tplayer_attack,tenemy_attack):
+    def test_fight_win_happy_path(self,tplayer_attack,tenemy_attack):
         tplayer = Player("test_Andrii")
         tenemy = Enemy(Hard(),1)
         game = Game(tplayer,tenemy)
@@ -260,7 +260,7 @@ class TestGame:
 
 
     @pytest.mark.parametrize("tplayer_attack, tenemy_attack",[(settings.SCISSORS, settings.STONE)])
-    def test_fight_lose(self,tplayer_attack,tenemy_attack):
+    def test_fight_lose_happy_path(self,tplayer_attack,tenemy_attack):
         tplayer = Player("test_Andrii")
         tenemy = Enemy(Hard(),1)
         game = Game(tplayer,tenemy)
@@ -295,29 +295,53 @@ class TestGame:
 
 
 # <!-------- PlayerRecord ---------!>
-def test_sort_records():
-    records = [
-        score.PlayerRecord("A", "Normal", 10),
-        score.PlayerRecord("B", "Normal", 5),
-        score.PlayerRecord("C", "Normal", 20),
-    ]
+class TestPlayerRecord:
+    def test_create_player_record_smoke(self):
+        tplayer_record = PlayerRecord("Mia", "Normal", 15)
+        assert tplayer_record is not None
 
-    records.sort(reverse=True)
 
-    scores = [r.score for r in records]
+    def test_create_player_records_exception_case(self):
+        with pytest.raises(ValueError):
+            records = [
+                score.PlayerRecord("B", "Normal", -99),
+                score.PlayerRecord("C", "Normal", -9.9),
+            ]
 
-    assert scores == [20, 10, 5]
 
-def test_eq_records():
-    records = [
-        score.PlayerRecord("A", "Normal", 10),
-        score.PlayerRecord("A", "Normal", 5),
-    ]  
+    def test_sort_records_happy_path(self):
+        records = [
+            score.PlayerRecord("A", "Normal", 10),
+            score.PlayerRecord("B", "Normal", 5),
+            score.PlayerRecord("C", "Normal", 20),
+        ]
+        records.sort(reverse=True)
+        scores = [r.score for r in records]
 
-    assert records[0] == records[1]
+        assert scores == [20, 10, 5]
+
+    
+    def test_sort_records_edge_case(self):
+        records = [
+            score.PlayerRecord("B", "Normal", 0),
+            score.PlayerRecord("C", "Normal", 999),
+        ]
+        records.sort(reverse=True)
+        scores = [r.score for r in records]
+
+        assert scores == [999, 0]    
+
+
+    def test_eq_records_happy_path():
+        records = [
+            score.PlayerRecord("A", "Normal", 10),
+            score.PlayerRecord("A", "Normal", 5),
+        ]  
+
+        assert records[0] == records[1]
+
 
 # <!-------- GameRecord ---------!>
-
 def test_add_record():
     game_record = GameRecord()
     new_record = PlayerRecord("Andrii", "Hard", 6)

@@ -5,6 +5,8 @@ class PlayerRecord:
     def __init__(self, name: str, mode: str, score: int):
         self.name = name
         self.mode = mode
+        if score < 0:
+            raise ValueError(f"Uncorrect value {score} ")
         self.score = score
     
     def __str__(self) ->str:
