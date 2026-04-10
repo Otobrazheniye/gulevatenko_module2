@@ -188,8 +188,9 @@ class TestEnemy:
         assert tenemy.lives == expected_lives
 
 
-    @pytest.mark.parametrize("player_history, expected_attacks",[(1, {settings.PAPER, settings.STONE}),
-        (2, {settings.STONE, settings.SCISSORS}),(3, {settings.PAPER, settings.SCISSORS}),])
+    @pytest.mark.parametrize("player_history, expected_attacks",[(settings.PAPER, {settings.SCISSORS, settings.PAPER}),
+        (settings.STONE, {settings.PAPER, settings.STONE}),
+        (settings.SCISSORS, {settings.STONE, settings.SCISSORS}),])
     def test_select_attack_happy_path(self,player_history, expected_attacks):
         tenemy = Enemy(Hard(), 3)
         tenemy.player_history = player_history
@@ -332,7 +333,7 @@ class TestPlayerRecord:
         assert scores == [999, 0]    
 
 
-    def test_eq_records_happy_path():
+    def test_eq_records_happy_path(self):
         records = [
             score.PlayerRecord("A", "Normal", 10),
             score.PlayerRecord("A", "Normal", 5),
@@ -342,49 +343,88 @@ class TestPlayerRecord:
 
 
 # <!-------- GameRecord ---------!>
-def test_add_record():
-    game_record = GameRecord()
-    new_record = PlayerRecord("Andrii", "Hard", 6)
-
-    game_record.add_record(new_record)
+class TestGameRecord:
+    def test_add_record_happy_path(self):
+        game_record = GameRecord()
+        new_record = PlayerRecord("Andrii", "Hard", 6)
+        game_record.add_record(new_record)
     
-    assert len(game_record.records) == 1
-    assert game_record.records[0] == new_record
+        assert len(game_record.records) == 1
+        assert game_record.records[0] == new_record
 
-def test_change_record():
-    game_record = GameRecord()
 
-    new_record = PlayerRecord("Andrii","Hard",6)
-    game_record.add_record(new_record)
+    def test_add_record_edge_case(self):
+        game_record = GameRecord()
+        new_record = PlayerRecord("Andrii", "Hard", 6)
+        new_record2 = PlayerRecord("Stephan","Normal",3)
+        game_record.add_record(new_record)
+        game_record.add_record(new_record2)
+    
+        assert len(game_record.records) == 2
+        assert game_record.records == [new_record,new_record2]
 
-    new_record2 = PlayerRecord("Andrii","Hard",10)
-    game_record.add_record(new_record2)
 
-    assert len(game_record.records) == 1
-    assert game_record.records[0] == new_record2
+    def test_add_record_exception_case(self):
+        game_record = GameRecord()
 
-def test_prepare_records_sort_and_limit(monkeypatch):
-    monkeypatch.setattr(settings, "MAX_SCORE", 2)
+        with pytest.raises(ValueError):
+            game_record.add_record("fish")
 
-    game_record = GameRecord()
 
-    game_record.records = [
-        PlayerRecord("A", "Normal", 10),
-        PlayerRecord("B", "Normal", 5),
-        PlayerRecord("C", "Normal", 20),
-    ]
+    def test_change_record_happy_path(self):
+        game_record = GameRecord()
+        new_record = PlayerRecord("Andrii","Hard",6)
+        game_record.add_record(new_record)
+        new_record2 = PlayerRecord("Andrii","Hard",10)
+        game_record.add_record(new_record2)
 
-    game_record.prepare_records()
+        assert len(game_record.records) == 1
+        assert game_record.records[0] == new_record2
 
-    scores = [r.score for r in game_record.records]
-    assert scores == [20, 10]
+    def test_change_records_happy_path_high_score(self):
+        game_record = GameRecord()
+        new_record1 = PlayerRecord("Andrii", "Hard", 6)
+        new_record2 = PlayerRecord("Andrii", "Hard", 10)
+        new_record3 = PlayerRecord("Andrii", "Hard", 10)
 
-    assert len(game_record.records) == 2
+        game_record.add_record(new_record1) 
+        game_record.add_record(new_record2)
+        game_record.add_record(new_record3)
+
+        assert len(game_record.records) == 1
+        assert game_record.records[0] == new_record2
+
+
+    def test_prepare_records_happy_path(self,monkeypatch):
+        monkeypatch.setattr(settings, "MAX_SCORE", 2)
+        game_record = GameRecord()
+        game_record.records = [
+            PlayerRecord("A", "Normal", 10),
+            PlayerRecord("B", "Normal", 5),
+            PlayerRecord("C", "Normal", 20),
+        ]
+        game_record.prepare_records()
+        scores = [r.score for r in game_record.records]
+
+        assert scores == [20, 10]
+        assert len(game_record.records) == 2
+
+
+    @pytest.mark.parametrize("limit, expected_limit", [(1000, 999), (1, 0)])
+    def test_prepare_records_edge_case(self, monkeypatch, limit, expected_limit):
+        monkeypatch.setattr(settings, "MAX_SCORE", expected_limit)
+        game_record = GameRecord()
+        game_record.records = []
+        for i in range(limit):
+            game_record.records.append(PlayerRecord("A", "Normal", i + 1))
+        game_record.prepare_records()
+        scores = [r.score for r in game_record.records]
+
+        assert len(game_record.records) == expected_limit
+        assert scores == sorted(scores, reverse=True)
 
 
 # <!-------- ScoreHandler: ---------!>
-
-
 def test_all_records_types():
     total_board = ScoreHandler("dublicate.txt")
 

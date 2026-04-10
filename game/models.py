@@ -49,17 +49,16 @@ class Normal(Mode):
 class Hard(Mode):
     def attack(self, player_history=None) -> int:
         match player_history:
-            case 1:
-                return random.choice((1, 2))
-            case 2:
-                return random.choice((2, 3))
-            case 3:
-                return random.choice((1, 3))
+            case settings.PAPER:
+                return random.choice((3, 1))   
+            case settings.STONE:
+                return random.choice((1, 2))   
+            case settings.SCISSORS:
+                return random.choice((2, 3))   
             case None:
                 return random.randint(1, 3)
             case _:
                 raise ValueError(f"Invalid player history: {player_history}")
-            
 
     def get_enemy_lives(self, level: int) -> int:
         return level + 2

@@ -30,13 +30,18 @@ class GameRecord:
         self.records = []
 
     def add_record(self,new_record:PlayerRecord):
+        if not isinstance(new_record,PlayerRecord):
+            raise ValueError(f"Value record is incorrect {new_record}")
         for i,record in enumerate(self.records):
-            if record == new_record:
-                self.records[i] = new_record
-                self.prepare_records()
+            if record.name == new_record.name and record.mode == new_record.mode:
+                if new_record.score > record.score:
+                    self.records[i] = new_record
+                    self.prepare_records()
                 return
         self.records.append(new_record)
         self.prepare_records()
+
+
 
     def prepare_records(self):
         self.records.sort(reverse=True)

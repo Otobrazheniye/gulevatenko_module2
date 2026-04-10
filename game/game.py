@@ -52,8 +52,8 @@ class Game:
     def play_round(self) -> None:
         self.print_round_info()
         player_attack = self.gameui.player_select_attack()
-        self.enemy.player_history = player_attack
         enemy_attack = self.enemy.enemy_select_attack()
+        self.enemy.player_history = player_attack
 
         self.handle_round_result( player_attack, enemy_attack)
 
