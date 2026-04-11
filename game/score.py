@@ -1,0 +1,100 @@
+from . import settings
+
+
+class PlayerRecord:
+    def __init__(self, name: str, mode: str, score: int):
+        self.name = name
+        self.mode = mode
+        if score < 0:
+            raise ValueError(f"Uncorrect value {score} ")
+        self.score = score
+    
+    def __str__(self) ->str:
+        return f"Name: {self.name}\tMode: {self.mode}\t Score: {self.score}\n"
+    
+    def __gt__(self,other:"PlayerRecord") -> bool:
+        if not isinstance(other,PlayerRecord):
+            return NotImplemented
+        return self.score > other.score
+
+    def __eq__(self:PlayerRecord,other:PlayerRecord)->bool:
+        if not isinstance(other,PlayerRecord):
+            return NotImplemented
+        if self.name == other.name:
+            return self.name == other.name and self.mode == other.mode
+        return False
+
+
+class GameRecord:
+    def __init__(self):
+        self.records = []
+
+    def add_record(self,new_record:PlayerRecord):
+        if not isinstance(new_record,PlayerRecord):
+            raise ValueError(f"Value record is incorrect {new_record}")
+        for i,record in enumerate(self.records):
+            if record.name == new_record.name and record.mode == new_record.mode:
+                if new_record.score > record.score:
+                    self.records[i] = new_record
+                    self.prepare_records()
+                return
+        self.records.append(new_record)
+        self.prepare_records()
+
+
+
+    def prepare_records(self):
+        self.records.sort(reverse=True)
+        self.records = self.records[:settings.MAX_SCORE]
+
+
+class ScoreHandler:
+    def __init__(self,file_name: str):
+        self.file_name = file_name
+        self.game_record = GameRecord()
+        self.read()
+
+    def read(self):
+        try:
+            with open(self.file_name, "r", encoding="utf-8") as f:
+                lines = f.readlines()
+
+            for line in lines:
+                line = line.strip()
+
+                if not line:
+                    continue
+
+                parts = line.split(",")
+
+                if len(parts) != 3:
+                    # print(f"Invalid line format: {line}")
+                    continue
+
+                name = parts[0].strip()
+                mode = parts[1].strip()
+                score_str = parts[2].strip()
+
+                if not score_str.isdigit():
+                    # print(f"Invalid score: {line}")
+                    continue
+
+                score = int(score_str)
+                record = PlayerRecord(name, mode, score)
+                self.game_record.add_record(record)
+
+        except FileNotFoundError:
+            print("File not found")
+
+    def save(self):
+        self.game_record.prepare_records()
+
+        with open(self.file_name, "w", encoding="utf-8") as f:
+            for record in self.game_record.records:
+                line = f"{record.name},{record.mode},{record.score}\n"
+                f.write(line)
+
+    def display(self):
+        for record in self.game_record.records:
+            print(record)
+
